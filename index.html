@@ -1,163 +1,306 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BaziChart | Discover Your Chinese Bazi & Zodiac Personality</title>
-    <meta
-      name="description"
-      content="Generate your Chinese Bazi chart, explore the Five Elements, and compare Chinese astrology with Western zodiac personality."
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="./styles.css" />
-  </head>
-  <body class="site-body">
-    <div class="aurora aurora--left"></div>
-    <div class="aurora aurora--right"></div>
-
-    <header class="site-header">
-      <a class="brand" href="./index.html">BaziChart</a>
-      <div class="header-actions">
-        <nav class="site-nav">
-          <a id="nav-calculator" href="./index.html">Calculator</a>
-          <a id="nav-knowledge" href="./knowledge.html">Knowledge</a>
-          <a class="nav-chip" id="nav-generate" href="#calculator">Generate Chart</a>
-        </nav>
-        <div class="lang-switch" aria-label="language switch">
-          <button class="lang-button" data-lang-switch="en" type="button">English</button>
-          <button class="lang-button" data-lang-switch="zh" type="button">中文</button>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>生辰八字 | 命理分析</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", serif;
+      background: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.75)),
+        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><defs><linearGradient id="sky" x1="0%25" y1="0%25" x2="0%25" y2="100%25"><stop offset="0%25" stop-color="%23e8e4dc"/><stop offset="60%25" stop-color="%23d4cfc4"/><stop offset="100%25" stop-color="%23c5c0b2"/></linearGradient></defs><rect fill="url(%23sky)" width="1200" height="800"/><g fill="%23222" opacity="0.06"><path d="M0 600 Q150 550 300 620 Q450 680 600 600 Q750 520 900 600 Q1050 680 1200 600 L1200 800 L0 800 Z"/><path d="M0 650 Q200 600 400 660 Q600 720 800 660 Q1000 600 1200 680 L1200 800 L0 800 Z"/><path d="M0 700 Q300 650 600 720 Q900 780 1200 700 L1200 800 L0 800 Z"/></g><g fill="%23111" opacity="0.12"><path d="M100 800 L120 500 L150 450 L180 480 L200 420 L230 400 L260 450 L280 380 L310 360 L340 420 L360 350 L390 380 L420 320 L450 350 L480 280 L510 300 L540 250 L570 280 L600 220 L630 260 L660 200 L690 240 L720 180 L750 220 L780 160 L810 200 L840 150 L870 190 L900 140 L930 180 L960 130 L990 170 L1020 120 L1050 160 L1080 110 L1110 150 L1140 100 L1170 140 L1200 90 L1200 800 Z"/></g><circle cx="950" cy="120" r="40" fill="%23d4a84b" opacity="0.6"/><circle cx="250" cy="180" r="25" fill="%23c9c5b8" opacity="0.5"/></svg>');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      min-height: 100vh;
+      color: #1a1a1a;
+      padding: 40px 20px;
+    }
+    .container { max-width: 800px; margin: 0 auto; }
+    #cover { text-align: center; animation: fadeIn 1s ease; }
+    .chinese-pattern { font-size: 42px; margin-bottom: 8px; color: #8b7355; letter-spacing: 8px; }
+    #cover h1 { font-size: clamp(28px, 5vw, 48px); font-weight: 300; color: #1a1a1a; margin-bottom: 8px; letter-spacing: 4px; }
+    #cover .subtitle { color: #555; font-size: 14px; margin-bottom: 48px; letter-spacing: 2px; }
+    .input-card {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid #d4c5b0;
+      border-radius: 4px;
+      padding: 40px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+    .input-title { font-size: 18px; color: #333; margin-bottom: 24px; letter-spacing: 2px; border-bottom: 1px solid #d4c5b0; padding-bottom: 12px; }
+    .date-inputs { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; justify-content: center; }
+    .input-group { display: flex; flex-direction: column; align-items: center; }
+    .input-group label { font-size: 12px; color: #777; margin-bottom: 8px; letter-spacing: 1px; }
+    .input-group input {
+      width: 90px; padding: 12px; border-radius: 2px; border: 1px solid #c5b8a5;
+      background: #faf9f7; color: #333; font-size: 18px; text-align: center;
+      outline: none; transition: all 0.3s; font-family: serif;
+    }
+    .input-group input:focus { border-color: #8b7355; background: #fff; }
+    .input-group input::placeholder { color: #bbb; font-size: 14px; }
+    .time-hint { font-size: 12px; color: #777; margin-bottom: 24px; font-style: italic; }
+    .btn-enter {
+      background: linear-gradient(135deg, #4a4a4a, #2a2a2a); color: #f5f5f5; border: none;
+      padding: 14px 60px; font-size: 16px; letter-spacing: 4px; cursor: pointer;
+      transition: all 0.3s; border-radius: 2px; font-family: serif;
+    }
+    .btn-enter:hover { background: linear-gradient(135deg, #5a5a5a, #3a3a3a); transform: translateY(-2px); }
+    .btn-enter:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    #result { display: none; animation: fadeIn 1s ease; }
+    .result-header { text-align: center; margin-bottom: 32px; }
+    .result-title { font-size: clamp(24px, 4vw, 36px); font-weight: 300; color: #1a1a1a; margin-bottom: 8px; letter-spacing: 2px; }
+    .result-subtitle { color: #555; font-size: 14px; }
+    .info-card {
+      background: rgba(255, 255, 255, 0.92); border: 1px solid #d4c5b0;
+      border-radius: 4px; padding: 32px; margin-bottom: 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+    .card-title { font-size: 16px; color: #8b7355; margin-bottom: 20px; letter-spacing: 2px; border-bottom: 1px solid #e8e0d5; padding-bottom: 10px; }
+    .bazi-container { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+    .bazi-column { display: flex; flex-direction: column; gap: 8px; }
+    .bazi-cell { width: 70px; height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid #d4c5b0; background: #faf9f7; border-radius: 2px; }
+    .bazi-cell .label { font-size: 10px; color: #888; margin-bottom: 2px; }
+    .bazi-cell .value { font-size: 22px; color: #1a1a1a; font-weight: 500; }
+    .bazi-cell.day-cell { background: #f0ebe3; border-color: #8b7355; }
+    .bazi-cell.day-cell .value { color: #8b7355; }
+    .canggan-table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 13px; }
+    .canggan-table th, .canggan-table td { padding: 10px; text-align: center; border: 1px solid #e8e0d5; }
+    .canggan-table th { background: #f5f2ed; color: #666; font-weight: normal; font-size: 12px; }
+    .canggan-table td { color: #333; }
+    .zodiac-section { display: flex; align-items: center; gap: 24px; margin-bottom: 24px; flex-wrap: wrap; justify-content: center; }
+    .zodiac-symbol { font-size: 64px; }
+    .zodiac-details h3 { font-size: 24px; font-weight: 400; margin-bottom: 4px; color: #1a1a1a; }
+    .zodiac-details p { color: #555; font-size: 14px; }
+    .zodiac-details .element { color: #8b7355; font-size: 13px; margin-top: 4px; }
+    .analysis-box { background: #faf9f7; border-left: 3px solid #8b7355; padding: 16px 20px; margin-top: 16px; border-radius: 0 4px 4px 0; }
+    .analysis-box h4 { font-size: 14px; color: #8b7355; margin-bottom: 10px; letter-spacing: 1px; }
+    .analysis-box p { color: #444; font-size: 14px; line-height: 1.8; }
+    .btn-retry { display: block; width: 100%; background: #4a4a4a; color: #f5f5f5; border: none; padding: 14px; border-radius: 2px; font-size: 14px; letter-spacing: 2px; cursor: pointer; transition: all 0.3s; font-family: serif; }
+    .btn-retry:hover { background: #5a5a5a; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .shishen-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 16px; }
+    .shishen-item { background: #f5f2ed; padding: 10px; text-align: center; border-radius: 2px; }
+    .shishen-item .label { font-size: 11px; color: #888; }
+    .shishen-item .value { font-size: 14px; color: #1a1a1a; font-weight: 500; }
+    .wuxing-grid { display: flex; justify-content: space-around; margin-top: 12px; flex-wrap: wrap; gap: 12px; }
+    .wuxing-item { text-align: center; }
+    .wuxing-item .label { color: #888; font-size: 12px; }
+    .wuxing-item .value { font-size: 20px; font-weight: 500; }
+    .nayin-row { display: flex; justify-content: space-around; margin-top: 16px; flex-wrap: wrap; gap: 8px; }
+    .nayin-item { background: #f5f2ed; padding: 8px 16px; border-radius: 2px; text-align: center; }
+    .nayin-item .label { font-size: 11px; color: #888; }
+    .nayin-item .value { font-size: 14px; color: #1a1a1a; }
+    @media (max-width: 600px) { .bazi-cell { width: 60px; height: 45px; } .bazi-cell .value { font-size: 18px; } .shishen-grid { grid-template-columns: repeat(2, 1fr); } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="cover">
+      <div class="chinese-pattern">◆ ◆ ◆</div>
+      <h1>生辰八字</h1>
+      <p class="subtitle">输入出生信息 · 探寻命理玄机</p>
+      <div class="input-card">
+        <div class="input-title">请输入出生信息</div>
+        <div class="date-inputs">
+          <div class="input-group"><label>年份</label><input type="number" id="year" placeholder="1990" min="1900" max="2100" /></div>
+          <div class="input-group"><label>月份</label><input type="number" id="month" placeholder="1" min="1" max="12" /></div>
+          <div class="input-group"><label>日期</label><input type="number" id="day" placeholder="1" min="1" max="31" /></div>
+          <div class="input-group"><label>时辰(小时)</label><input type="number" id="hour" placeholder="12" min="0" max="23" /></div>
         </div>
+        <p class="time-hint">※ 如不确定具体出生时辰，可使用 12:00 作为默认值</p>
+        <button class="btn-enter" id="btnEnter" onclick="showResult()" disabled>开始测算</button>
       </div>
-    </header>
+    </div>
+    <div id="result"></div>
+  </div>
 
-    <main>
-      <section class="hero-shell">
-        <div class="hero-copy">
-          <p class="eyebrow" id="home-eyebrow">Chinese Astrology for Modern Self-Discovery</p>
-          <h1 id="home-title">Discover Your Chinese Bazi & Zodiac Personality</h1>
-          <p class="hero-text" id="home-subtitle">
-            Explore your personality through Chinese Bazi astrology and Western zodiac comparison.
-            Generate your Four Pillars chart, review your Five Elements balance, and unlock a premium
-            report when you want to go deeper.
-          </p>
+  <script src="lunar.js"></script>
+  <script>
+    // 星座数据
+    const constellations = [
+      {name:"白羊座",symbol:"♈",date:[3,21,4,19],element:"火",trait:"热情冲动",desc:"白羊座的人充满活力和热情，积极进取，喜欢冒险和挑战。他们行动力强，做事果断，但有时可能过于急躁和缺乏耐心。作为火象星座，他们天生具有领导才能，喜欢成为焦点，不喜欢被束缚。"},
+      {name:"金牛座",symbol:"♉",date:[4,20,5,20],element:"土",trait:"稳重务实",desc:"金牛座的人稳重踏实，注重实际价值和生活品质。他们忠诚可靠，很有耐心，喜欢稳定的生活环境。作为土象星座，他们善于理财，对美的事物有独特的鉴赏力，但有时可能过于固执。"},
+      {name:"双子座",symbol:"♊",date:[5,21,6,21],element:"风",trait:"聪明善变",desc:"双子座的人思维敏捷，善于沟通，喜欢新鲜事物。他们性格多变，机智幽默，适应能力强。作为风象星座，他们善于表达，思维活跃，但有时可能显得不够专注和可靠。"},
+      {name:"巨蟹座",symbol:"♋",date:[6,22,7,22],element:"水",trait:"温柔顾家",desc:"巨蟹座的人情感丰富，重视家庭和亲情。他们温柔体贴，富有同情心，善于照顾他人。作为水象星座，他们直觉敏锐，记忆力强，但有时可能过于敏感和情绪化。"},
+      {name:"狮子座",symbol:"♌",date:[7,23,8,22],element:"火",trait:"自信领导",desc:"狮子座的人自信大方，具有强烈的领导欲望和表演天赋。他们热情慷慨，喜欢成为焦点。作为火象星座，他们有王者之气，善于激励他人，但有时可能过于自负和要面子。"},
+      {name:"处女座",symbol:"♍",date:[8,23,9,22],element:"土",trait:"完美主义",desc:"处女座的人追求完美，注重细节，善于分析和整理。他们勤劳踏实，有很强的责任感。作为土象星座，他们擅长发现问题并改进，但有时可能过于挑剔和苛刻。"},
+      {name:"天秤座",symbol:"♎",date:[9,23,10,23],element:"风",trait:"和谐优雅",desc:"天秤座的人追求平衡和谐，善于社交，审美能力很强。他们公平公正，喜欢美好的事物。作为风象星座，他们善于协调关系，但做决定时往往犹豫不决。"},
+      {name:"天蝎座",symbol:"♏",date:[10,24,11,22],element:"水",trait:"神秘执着",desc:"天蝎座的人深沉内敛，意志坚定，情感强烈。他们洞察力强，善于隐藏真实想法。作为水象星座，他们执着于目标，占有欲强，但有时可能记仇和报复心重。"},
+      {name:"射手座",symbol:"♐",date:[11,23,12,21],element:"火",trait:"自由乐观",desc:"射手座的人热爱自由，乐观开朗，喜欢旅行和探索。他们幽默风趣，思想开放。作为火象星座，他们追求真理，不喜欢被束缚，但有时可能过于冲动和直言不讳。"},
+      {name:"摩羯座",symbol:"♑",date:[12,22,1,19],element:"土",trait:"稳重野心",desc:"摩羯座的人稳重踏实，有强烈的责任感和事业心。他们勤奋努力，善于规划。作为土象星座，他们务实低调，目标导向，但有时可能过于严肃和冷漠。"},
+      {name:"水瓶座",symbol:"♒",date:[1,20,2,18],element:"风",trait:"创新独立",desc:"水瓶座的人独立创新，思维超前，喜欢追求独特。他们人道主义，善于思考。作为风象星座，他们有自己的见解，不随波逐流，但有时可能显得冷漠和叛逆。"},
+      {name:"双鱼座",symbol:"♓",date:[2,19,3,20],element:"水",trait:"浪漫梦幻",desc:"双鱼座的人浪漫敏感，富有想象力和同情心。他们艺术气质浓厚，善于理解他人。作为水象星座，他们情感丰富，直觉敏锐，但有时可能过于理想化和逃避现实。"}
+    ];
 
-          <div class="hero-pills">
-            <span id="pill-1">Four Pillars</span>
-            <span id="pill-2">Five Elements</span>
-            <span id="pill-3">Western Zodiac Comparison</span>
+    function getConstellation(month, day) {
+      for (const c of constellations) {
+        if ((month === c.date[0] && day >= c.date[1]) || (month === c.date[2] && day <= c.date[3])) return c;
+      }
+      return constellations[0];
+    }
+
+    // 获取时辰名称
+    function getShichen(hour) {
+      const shichen = ["子时","丑时","寅时","卯时","辰时","巳时","午时","未时","申时","酉时","戌时","亥时"];
+      const idx = Math.floor((hour + 1) / 2) % 12;
+      return shichen[idx];
+    }
+
+    const yearInput = document.getElementById("year");
+    const monthInput = document.getElementById("month");
+    const dayInput = document.getElementById("day");
+    const hourInput = document.getElementById("hour");
+    const btnEnter = document.getElementById("btnEnter");
+
+    function validateInput() {
+      const year = parseInt(yearInput.value), month = parseInt(monthInput.value), day = parseInt(dayInput.value), hour = parseInt(hourInput.value);
+      if (year >= 1900 && year <= 2100 && month >= 1 && month <= 12 && day >= 1 && day <= 31 && hour >= 0 && hour <= 23) {
+        const daysInMonth = new Date(year, month, 0).getDate();
+        if (day <= daysInMonth) { btnEnter.disabled = false; return; }
+      }
+      btnEnter.disabled = true;
+    }
+    yearInput.addEventListener("input", validateInput);
+    monthInput.addEventListener("input", validateInput);
+    dayInput.addEventListener("input", validateInput);
+    hourInput.addEventListener("input", validateInput);
+
+    function showResult() {
+      const year = parseInt(yearInput.value), month = parseInt(monthInput.value), day = parseInt(dayInput.value), hour = parseInt(hourInput.value) || 12;
+      if (!year || !month || !day) return;
+
+      // 使用 lunar.js 库获取精确的八字
+      const solar = Solar.fromYmdHms(year, month, day, hour, 0, 0);
+      const lunar = solar.getLunar();
+      const baZi = lunar.getEightChar(); // 获取八字
+
+      // 获取八字各柱
+      const yearZhu = baZi.getYear();      // 年柱
+      const monthZhu = baZi.getMonth();     // 月柱
+      const dayZhu = baZi.getDay();         // 日柱
+      const timeZhu = baZi.getTime();       // 时柱
+
+      // 获取天干地支
+      const yearGan = baZi.getYearGan();    // 年干
+      const yearZhi = baZi.getYearZhi();   // 年支
+      const monthGan = baZi.getMonthGan(); // 月干
+      const monthZhi = baZi.getMonthZhi(); // 月支
+      const dayGan = baZi.getDayGan();     // 日干
+      const dayZhi = baZi.getDayZhi();     // 日支
+      const timeGan = baZi.getTimeGan();   // 时干
+      const timeZhi = baZi.getTimeZhi();   // 时支
+
+      // 获取十神
+      const yearShiShen = baZi.getYearShiShenGan();   // 年干十神
+      const monthShiShen = baZi.getMonthShiShenGan(); // 月干十神
+      const dayShiShen = baZi.getDayShiShenGan();     // 日干十神（日主）
+      const timeShiShen = baZi.getTimeShiShenGan();   // 时干十神
+
+      // 获取五行
+      const wuxing = baZi.getBaZiWuXing(); // 五行
+
+      // 获取纳音
+      const nayin = baZi.getBaZiNaYin(); // 纳音
+
+      // 获取星座
+      const zodiac = getConstellation(month, day);
+
+      // 计算五行统计
+      const wuxingMap = {木:0,火:0,土:0,金:0,水:0};
+      [yearZhu, monthZhu, dayZhu, timeZhu].forEach(z => {
+        wuxingMap[wuxing.charAt(0)]++;
+        wuxingMap[wuxing.charAt(2)]++;
+        wuxingMap[wuxing.charAt(4)]++;
+        wuxingMap[wuxing.charAt(6)]++;
+      });
+
+      // 显示结果
+      document.getElementById("cover").style.display = "none";
+      const resultDiv = document.getElementById("result");
+      resultDiv.style.display = "block";
+
+      let html = `
+        <div class="result-header">
+          <div class="result-title">${year}年${month}月${day}日 ${hour}:00</div>
+          <div class="result-subtitle">${getShichen(hour)} · 农历 ${lunar.getYearInChinese()}年 ${lunar.getMonthInChinese()} ${lunar.getDayInChinese()}</div>
+        </div>
+
+        <div class="info-card">
+          <div class="card-title">◈ 八字命盘</div>
+          <div class="bazi-container">
+            <div class="bazi-column">
+              <div class="bazi-cell"><span class="label">年柱</span><span class="value">${yearZhu}</span></div>
+              <div class="bazi-cell"><span class="label">天干</span><span class="value">${yearGan}</span></div>
+              <div class="bazi-cell"><span class="label">地支</span><span class="value">${yearZhi}</span></div>
+            </div>
+            <div class="bazi-column">
+              <div class="bazi-cell"><span class="label">月柱</span><span class="value">${monthZhu}</span></div>
+              <div class="bazi-cell"><span class="label">天干</span><span class="value">${monthGan}</span></div>
+              <div class="bazi-cell"><span class="label">地支</span><span class="value">${monthZhi}</span></div>
+            </div>
+            <div class="bazi-column">
+              <div class="bazi-cell day-cell"><span class="label">日柱</span><span class="value">${dayZhu}</span></div>
+              <div class="bazi-cell day-cell"><span class="label">天干</span><span class="value">${dayGan}</span></div>
+              <div class="bazi-cell day-cell"><span class="label">地支</span><span class="value">${dayZhi}</span></div>
+            </div>
+            <div class="bazi-column">
+              <div class="bazi-cell"><span class="label">时柱</span><span class="value">${timeZhu}</span></div>
+              <div class="bazi-cell"><span class="label">天干</span><span class="value">${timeGan}</span></div>
+              <div class="bazi-cell"><span class="label">地支</span><span class="value">${timeZhi}</span></div>
+            </div>
+          </div>
+
+          <div class="card-title" style="margin-top:24px;">◈ 十神详解（日主${dayGan}）</div>
+          <div class="shishen-grid">
+            <div class="shishen-item"><div class="label">年干</div><div class="value">${yearShiShen}</div></div>
+            <div class="shishen-item"><div class="label">月干</div><div class="value">${monthShiShen}</div></div>
+            <div class="shishen-item"><div class="label">日干</div><div class="value">${dayShiShen}</div></div>
+            <div class="shishen-item"><div class="label">时干</div><div class="value">${timeShiShen}</div></div>
+          </div>
+
+          <div class="card-title" style="margin-top:24px;">◈ 五行分布</div>
+          <div class="wuxing-grid">
+            <div class="wuxing-item"><div class="label">木</div><div class="value">${wuxingMap['木']}</div></div>
+            <div class="wuxing-item"><div class="label">火</div><div class="value">${wuxingMap['火']}</div></div>
+            <div class="wuxing-item"><div class="label">土</div><div class="value">${wuxingMap['土']}</div></div>
+            <div class="wuxing-item"><div class="label">金</div><div class="value">${wuxingMap['金']}</div></div>
+            <div class="wuxing-item"><div class="label">水</div><div class="value">${wuxingMap['水']}</div></div>
+          </div>
+
+          <div class="card-title" style="margin-top:24px;">◈ 纳音五行</div>
+          <div class="nayin-row">
+            <div class="nayin-item"><div class="label">年</div><div class="value">${nayin.substring(0,3)}</div></div>
+            <div class="nayin-item"><div class="label">月</div><div class="value">${nayin.substring(3,6)}</div></div>
+            <div class="nayin-item"><div class="label">日</div><div class="value">${nayin.substring(6,9)}</div></div>
+            <div class="nayin-item"><div class="label">时</div><div class="value">${nayin.substring(9,12)}</div></div>
           </div>
         </div>
 
-        <div class="calculator-card" id="calculator">
-          <div class="card-topline" id="calc-topline">Calculator</div>
-          <h2 id="calc-title">Generate Your Bazi Chart</h2>
-          <p class="card-text" id="calc-copy">
-            Enter your birth details to calculate your personal Four Pillars of Destiny.
-          </p>
-
-          <form id="calculator-form" class="calculator-form">
-            <label class="field">
-              <span id="field-date-label">Birth Date</span>
-              <input id="birth-date" name="birth-date" type="date" required />
-            </label>
-
-            <label class="field">
-              <span id="field-time-label">Birth Time</span>
-              <input id="birth-time" name="birth-time" type="time" value="12:00" required />
-              <small id="field-time-help">If you are unsure about the exact birth time, use 12:00 as a reference.</small>
-            </label>
-
-            <label class="field">
-              <span id="field-location-label">Birth Location</span>
-              <input
-                id="birth-location"
-                name="birth-location"
-                type="text"
-                list="location-list"
-                placeholder="City, Country"
-                required
-              />
-              <datalist id="location-list"></datalist>
-            </label>
-
-            <button type="submit" class="primary-button" id="calc-button">Generate My Bazi Chart</button>
-            <p class="micro-note" id="calc-note">
-              Bazi uses your birth time to create a Four Pillars chart and reveal your Five Elements balance.
-            </p>
-          </form>
-        </div>
-      </section>
-
-      <section class="feature-strip">
-        <article class="info-card">
-          <h3 id="feature-1-title">Bazi uses your birth time to create a Four Pillars chart</h3>
-          <p id="feature-1-copy">
-            Your year, month, day, and hour become the core symbolic structure of your Chinese astrology reading.
-          </p>
-        </article>
-        <article class="info-card">
-          <h3 id="feature-2-title">It reveals your Five Elements balance</h3>
-          <p id="feature-2-copy">
-            See how Wood, Fire, Earth, Metal, and Water distribute through your chart and which energies stand out.
-          </p>
-        </article>
-        <article class="info-card">
-          <h3 id="feature-3-title">It helps understand your personality patterns</h3>
-          <p id="feature-3-copy">
-            Get a readable introduction to your energy style, strengths, and the contrast with your Western zodiac.
-          </p>
-        </article>
-      </section>
-
-      <section class="product-band">
-        <div class="band-copy">
-          <p class="eyebrow" id="how-eyebrow">How It Works</p>
-          <h2 id="how-title">Simple to use. Easy to understand. Built to share.</h2>
-          <p id="how-copy">
-            We designed BaziChart for international users who are curious about Chinese metaphysics but want a
-            modern, approachable experience.
-          </p>
+        <div class="info-card">
+          <div class="card-title">◈ 星座</div>
+          <div class="zodiac-section">
+            <div class="zodiac-symbol">${zodiac.symbol}</div>
+            <div class="zodiac-details"><h3>${zodiac.name}</h3><p>${zodiac.trait}</p><div class="element">${zodiac.element}象星座</div></div>
+          </div>
+          <div class="analysis-box"><h4>✦ 性格分析</h4><p>${zodiac.desc}</p></div>
         </div>
 
-        <div class="steps-grid">
-          <article class="step-card">
-            <span class="step-no">01</span>
-            <h3 id="step-1-title">Enter birth info</h3>
-            <p id="step-1-copy">Add your birth date, birth time, and birth location.</p>
-          </article>
-          <article class="step-card">
-            <span class="step-no">02</span>
-            <h3 id="step-2-title">Generate Bazi</h3>
-            <p id="step-2-copy">We convert your data into a Four Pillars chart and Five Elements profile.</p>
-          </article>
-          <article class="step-card">
-            <span class="step-no">03</span>
-            <h3 id="step-3-title">View result</h3>
-            <p id="step-3-copy">See your Western zodiac, hidden elements, and a short personality reading.</p>
-          </article>
-          <article class="step-card">
-            <span class="step-no">04</span>
-            <h3 id="step-4-title">Unlock full analysis</h3>
-            <p id="step-4-copy">Upgrade for deeper interpretation, 10-year cycles, and a downloadable report.</p>
-          </article>
-        </div>
-      </section>
-    </main>
+        <button class="btn-retry" onclick="retry()">重新测算</button>
+      `;
 
-    <footer class="site-footer">
-      <p>BaziChart</p>
-      <div class="footer-links">
-        <a id="footer-calculator" href="./index.html">Calculator</a>
-        <a id="footer-knowledge" href="./knowledge.html">Knowledge</a>
-      </div>
-    </footer>
+      resultDiv.innerHTML = html;
+      window.scrollTo({top:0,behavior:"smooth"});
+    }
 
-    <script src="./shared.js"></script>
-    <script src="./home.js"></script>
-  </body>
+    function retry() {
+      document.getElementById("result").style.display = "none";
+      document.getElementById("cover").style.display = "block";
+      yearInput.value = ""; monthInput.value = ""; dayInput.value = ""; hourInput.value = "";
+      btnEnter.disabled = true;
+      window.scrollTo({top:0,behavior:"smooth"});
+    }
+  </script>
+</body>
 </html>
