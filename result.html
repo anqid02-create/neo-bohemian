@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Bazi Result | BaziChart</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="site-body site-body--result">
+    <div class="aurora aurora--left"></div>
+    <div class="aurora aurora--right"></div>
+
+    <header class="site-header">
+      <a class="brand" href="./index.html">BaziChart</a>
+      <div class="header-actions">
+        <nav class="site-nav">
+          <a id="nav-calculator" href="./index.html">Calculator</a>
+          <a id="nav-knowledge" href="./knowledge.html">Knowledge</a>
+          <a class="nav-chip" id="nav-another" href="./index.html">Try Another Chart</a>
+        </nav>
+        <div class="lang-switch" aria-label="language switch">
+          <button class="lang-button" data-lang-switch="en" type="button">English</button>
+          <button class="lang-button" data-lang-switch="zh" type="button">中文</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="result-layout" id="result-root">
+      <section class="result-intro">
+        <p class="eyebrow" id="result-eyebrow">Your Personalized Reading</p>
+        <h1 id="result-heading">Your Bazi Chart</h1>
+        <p class="hero-text" id="result-meta"></p>
+      </section>
+
+      <section class="result-grid">
+        <article class="result-card">
+          <p class="card-topline" id="western-topline">Western Zodiac</p>
+          <h2 id="western-sign-name">-</h2>
+          <p id="western-sign-summary"></p>
+        </article>
+
+        <article class="result-card result-card--wide">
+          <div class="section-title-row">
+            <div>
+              <p class="card-topline" id="bazi-topline">Bazi Chart</p>
+              <h2 id="bazi-title">Your Bazi Chart (Four Pillars of Destiny)</h2>
+            </div>
+            <p class="section-help" id="bazi-help">Each pillar represents different aspects of life.</p>
+          </div>
+          <div class="pillars-guide">
+            <span id="guide-year">Year → background</span>
+            <span id="guide-month">Month → career</span>
+            <span id="guide-day">Day → core self</span>
+            <span id="guide-hour">Hour → future potential</span>
+          </div>
+          <div class="table-scroll">
+            <table class="pillars-table" id="pillars-table">
+              <thead>
+                <tr>
+                  <th id="th-layer">Layer</th>
+                  <th id="th-year">Year</th>
+                  <th id="th-month">Month</th>
+                  <th id="th-day">Day</th>
+                  <th id="th-hour">Hour</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="result-card">
+          <p class="card-topline" id="hidden-topline">Hidden Elements</p>
+          <h2 id="hidden-title">Deeper Influences in Your Chart</h2>
+          <p class="section-help" id="hidden-help">Hidden elements represent deeper influences in your chart.</p>
+          <div class="hidden-grid" id="hidden-grid"></div>
+        </article>
+
+        <article class="result-card">
+          <p class="card-topline" id="elements-topline">Five Elements Balance</p>
+          <h2 id="elements-title">Your Energy Distribution</h2>
+          <p id="elements-summary"></p>
+          <div class="elements-bars" id="elements-bars"></div>
+        </article>
+
+        <article class="result-card result-card--wide">
+          <p class="card-topline" id="summary-topline">Personality Summary</p>
+          <h2 id="summary-title">Free Snapshot</h2>
+          <p id="personality-summary"></p>
+          <div class="compare-card">
+            <p class="compare-label" id="compare-label">Chinese Astrology vs Western Zodiac</p>
+            <p id="compare-summary"></p>
+          </div>
+        </article>
+
+        <article class="premium-card result-card--wide">
+          <div>
+            <p class="card-topline" id="premium-topline">Premium Analysis</p>
+            <h2 id="premium-title">Unlock Your Full Bazi Analysis</h2>
+            <p id="premium-copy">
+              Get the extended interpretation of your chart with deeper insights, premium guidance, and a shareable report.
+            </p>
+          </div>
+          <div class="premium-grid">
+            <span id="premium-item-1">detailed personality analysis</span>
+            <span id="premium-item-2">element balance interpretation</span>
+            <span id="premium-item-3">relationship compatibility</span>
+            <span id="premium-item-4">career tendencies</span>
+            <span id="premium-item-5">10-year energy cycles</span>
+            <span id="premium-item-6">downloadable report</span>
+          </div>
+          <button class="primary-button primary-button--light" id="premium-cta" type="button">Get Full Report – $9.99</button>
+        </article>
+      </section>
+    </main>
+
+    <script src="./lunar.min.js"></script>
+    <script src="./shared.js"></script>
+    <script src="./result.js"></script>
+  </body>
+</html>

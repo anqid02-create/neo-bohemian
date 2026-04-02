@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Premium Report | BaziChart</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="site-body site-body--result">
+    <div class="aurora aurora--left"></div>
+    <div class="aurora aurora--right"></div>
+
+    <header class="site-header">
+      <a class="brand" href="./index.html">BaziChart</a>
+      <div class="header-actions">
+        <nav class="site-nav">
+          <a id="nav-calculator" href="./index.html">Calculator</a>
+          <a id="nav-knowledge" href="./knowledge.html">Knowledge</a>
+          <a class="nav-chip" id="premium-back-link" href="./result.html">Back to Result</a>
+        </nav>
+        <div class="lang-switch" aria-label="language switch">
+          <button class="lang-button" data-lang-switch="en" type="button">English</button>
+          <button class="lang-button" data-lang-switch="zh" type="button">中文</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="result-layout">
+      <section class="result-intro">
+        <p class="eyebrow" id="premium-eyebrow">Premium Report Unlocked</p>
+        <h1 id="premium-heading">Your Full Bazi Analysis</h1>
+        <p class="hero-text" id="premium-meta"></p>
+      </section>
+
+      <section class="result-grid">
+        <article class="premium-card result-card--wide">
+          <div>
+            <p class="card-topline" id="premium-personality-topline">Deep Personality Analysis</p>
+            <h2 id="premium-personality-title">Your Core Pattern</h2>
+          </div>
+          <p id="premium-personality-copy"></p>
+        </article>
+
+        <article class="result-card">
+          <p class="card-topline" id="premium-element-topline">Element Balance Interpretation</p>
+          <h2 id="premium-element-title">How Your Energy Moves</h2>
+          <p id="premium-element-copy"></p>
+        </article>
+
+        <article class="result-card">
+          <p class="card-topline" id="premium-relationship-topline">Relationship Compatibility</p>
+          <h2 id="premium-relationship-title">Connection Style</h2>
+          <p id="premium-relationship-copy"></p>
+        </article>
+
+        <article class="result-card">
+          <p class="card-topline" id="premium-career-topline">Career Tendencies</p>
+          <h2 id="premium-career-title">Work Style & Direction</h2>
+          <p id="premium-career-copy"></p>
+        </article>
+
+        <article class="result-card result-card--wide">
+          <div class="section-title-row">
+            <div>
+              <p class="card-topline" id="premium-cycles-topline">10-Year Energy Cycles</p>
+              <h2 id="premium-cycles-title">Long-Term Rhythm</h2>
+            </div>
+            <button class="nav-chip" id="download-report" type="button">Download Report</button>
+          </div>
+          <div class="cycles-grid" id="cycles-grid"></div>
+        </article>
+      </section>
+    </main>
+
+    <script src="./lunar.min.js"></script>
+    <script src="./shared.js"></script>
+    <script src="./premium.js"></script>
+  </body>
+</html>

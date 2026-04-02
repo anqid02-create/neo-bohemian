@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Checkout | BaziChart</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="site-body">
+    <div class="aurora aurora--left"></div>
+    <div class="aurora aurora--right"></div>
+
+    <header class="site-header">
+      <a class="brand" href="./index.html">BaziChart</a>
+      <div class="header-actions">
+        <nav class="site-nav">
+          <a id="nav-calculator" href="./index.html">Calculator</a>
+          <a id="nav-knowledge" href="./knowledge.html">Knowledge</a>
+          <a class="nav-chip" id="checkout-back-link" href="./result.html">Back to Result</a>
+        </nav>
+        <div class="lang-switch" aria-label="language switch">
+          <button class="lang-button" data-lang-switch="en" type="button">English</button>
+          <button class="lang-button" data-lang-switch="zh" type="button">中文</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="checkout-layout">
+      <section class="checkout-card">
+        <div>
+          <p class="eyebrow" id="checkout-eyebrow">Premium Checkout</p>
+          <h1 id="checkout-title">Unlock Your Full Bazi Analysis</h1>
+          <p class="hero-text" id="checkout-summary"></p>
+        </div>
+
+        <div class="checkout-grid">
+          <div class="checkout-panel">
+            <h2 id="checkout-what-title">What You’ll Get</h2>
+            <div class="premium-grid">
+              <span id="checkout-item-1">detailed personality analysis</span>
+              <span id="checkout-item-2">element balance interpretation</span>
+              <span id="checkout-item-3">relationship compatibility</span>
+              <span id="checkout-item-4">career tendencies</span>
+              <span id="checkout-item-5">10-year energy cycles</span>
+              <span id="checkout-item-6">downloadable report</span>
+            </div>
+          </div>
+
+          <form id="checkout-form" class="checkout-panel checkout-form">
+            <div class="checkout-price-row">
+              <div>
+                <p class="card-topline" id="checkout-price-topline">One-Time Payment</p>
+                <h2>$9.99</h2>
+              </div>
+              <span class="status-pill" id="checkout-status">Demo Checkout</span>
+            </div>
+
+            <label class="field">
+              <span id="checkout-email-label">Email</span>
+              <input id="checkout-email" type="email" placeholder="you@example.com" required />
+            </label>
+
+            <label class="field">
+              <span id="checkout-card-label">Card Number</span>
+              <input id="checkout-card" type="text" placeholder="4242 4242 4242 4242" required />
+            </label>
+
+            <div class="split-fields">
+              <label class="field">
+                <span id="checkout-expiry-label">Expiry</span>
+                <input id="checkout-expiry" type="text" placeholder="12 / 28" required />
+              </label>
+              <label class="field">
+                <span id="checkout-cvc-label">CVC</span>
+                <input id="checkout-cvc" type="text" placeholder="123" required />
+              </label>
+            </div>
+
+            <button class="primary-button" id="checkout-button" type="submit">Pay $9.99</button>
+            <p class="micro-note" id="checkout-note">This is a demo payment flow for product prototyping. No real card will be charged.</p>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <script src="./shared.js"></script>
+    <script src="./checkout.js"></script>
+  </body>
+</html>
