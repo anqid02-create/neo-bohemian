@@ -1,7 +1,7 @@
-const params = new URLSearchParams(window.location.search);
+const params = new URLSearchParams(window.birthlocation.search);
 const date = params.get("date");
 const time = params.get("time") || "12:00";
-const location = params.get("location") || "";
+const birthLocation = params.get("birthlocation") || "";
 const emailInput = document.getElementById("checkout-email");
 const paypalButtonContainer = document.getElementById("paypal-button-container");
 const paypalStatus = document.getElementById("paypal-status");
@@ -19,7 +19,7 @@ const translations = {
     navGenerate: "Generate Chart",
     eyebrow: "Premium Checkout",
     title: "Unlock Your Full Destiny Report",
-    summary: `You are unlocking the premium manuscript for ${location} on ${date} at ${time}. Pay once with PayPal and continue directly into the full report.`,
+    summary: `You are unlocking the premium manuscript for ${birthlocation} on ${date} at ${time}. Pay once with PayPal and continue directly into the full report.`,
     whatTopline: "Premium Access",
     whatTitle: "What You'll Get",
     itemLabel: "Included",
@@ -70,7 +70,7 @@ const translations = {
     navGenerate: "生成命盘",
     eyebrow: "高级支付",
     title: "解锁完整深度命盘报告",
-    summary: `你正在为 ${location}（${date} ${time}）解锁完整高级手稿。通过 PayPal 完成一次支付后，将直接进入完整版报告。`,
+    summary: `你正在为 ${birthlocation}（${date} ${time}）解锁完整高级手稿。通过 PayPal 完成一次支付后，将直接进入完整版报告。`,
     whatTopline: "高级权限",
     whatTitle: "你将获得",
     itemLabel: "包含内容",
