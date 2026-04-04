@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
     ).toString("base64");
 
     const response = await fetch(
-      `https://api-m.paypal.com`,
+      `https://api-m.paypal.com/v2/checkout/orders/${orderID}/capture`,
       {
         method: "POST",
         headers: {
