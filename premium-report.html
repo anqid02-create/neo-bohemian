@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Premium Report | BaziChart</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#e9c349",
+              secondary: "#adcbd6",
+              tertiary: "#dab9ff",
+              background: "#11131c",
+              panel: "#1d1f29",
+              low: "#191b24",
+              high: "#282933",
+              highest: "#32343e",
+              outline: "#32343e",
+              text: "#e1e1ef",
+              muted: "#c7c5cc",
+              error: "#ffb4ab",
+            },
+            fontFamily: {
+              headline: ["Cormorant Garamond", "serif"],
+              body: ["Manrope", "sans-serif"],
+              label: ["Manrope", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0px",
+              lg: "2px",
+              xl: "4px",
+              full: "9999px",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background:
+          radial-gradient(circle at top, rgba(233, 195, 73, 0.08), transparent 20%),
+          radial-gradient(circle at 85% 10%, rgba(218, 185, 255, 0.08), transparent 20%),
+          #11131c;
+        color: #e1e1ef;
+        font-family: "Manrope", sans-serif;
+      }
+
+      .material-symbols-outlined {
+        font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+      }
+
+      .celestial-ink-gradient {
+        background:
+          radial-gradient(circle at 0% 0%, rgba(233, 195, 73, 0.05) 0%, transparent 50%),
+          radial-gradient(circle at 100% 100%, rgba(173, 203, 214, 0.05) 0%, transparent 50%);
+      }
+
+      .ink-text-shadow {
+        text-shadow: 0 0 20px rgba(233, 195, 73, 0.2);
+      }
+
+      .glass-card {
+        background: rgba(29, 31, 41, 0.4);
+        backdrop-filter: blur(8px);
+      }
+
+      .lang-pill {
+        border: 1px solid rgba(233, 195, 73, 0.28);
+        background: rgba(17, 19, 28, 0.66);
+      }
+
+      .lang-pill.is-active {
+        background: rgba(233, 195, 73, 0.16);
+        color: #e9c349;
+      }
+
+      .side-link.is-active {
+        color: #e9c349;
+        border-right: 2px solid #e9c349;
+        background: rgba(233, 195, 73, 0.05);
+      }
+    </style>
+  </head>
+  <body class="celestial-ink-gradient bg-background text-text selection:bg-primary/30">
+    <nav class="fixed inset-x-0 top-0 z-50 bg-[#11131c]/80 backdrop-blur-xl shadow-[0_30px_50px_rgba(12,14,23,0.45)]">
+      <div class="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 md:px-8">
+        <a class="font-headline text-3xl font-semibold italic tracking-wide text-primary" href="./index.html">BaziChart</a>
+        <div class="hidden items-center gap-8 md:flex">
+          <a class="font-headline tracking-wide text-secondary transition-colors hover:text-tertiary" id="nav-calculator" href="./index.html">Home</a>
+          <a class="font-headline tracking-wide text-secondary transition-colors hover:text-tertiary" id="nav-knowledge" href="./knowledge.html">Knowledge</a>
+          <a class="font-headline tracking-wide text-secondary transition-colors hover:text-tertiary" id="nav-generate" href="./index.html#calculator">Generate Chart</a>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-primary">language</span>
+          <div class="flex items-center gap-2">
+            <button class="lang-pill rounded-full px-3 py-1.5 text-sm font-semibold text-secondary transition" data-lang-switch="en" type="button">English</button>
+            <button class="lang-pill rounded-full px-3 py-1.5 text-sm font-semibold text-secondary transition" data-lang-switch="zh" type="button">中文</button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <aside class="fixed left-0 top-0 z-40 hidden h-screen w-64 flex-col border-r border-outline/30 bg-[#08090e] py-24 lg:flex">
+      <div class="mb-10 px-8">
+        <p class="mb-2 font-label text-[9px] uppercase tracking-[0.3em] text-primary" id="side-subtitle">Subject 882</p>
+        <h2 class="font-headline text-lg italic" id="side-title">The Manuscript</h2>
+      </div>
+      <nav class="flex flex-col overflow-y-auto text-[10px] font-bold uppercase tracking-widest">
+        <a class="side-link flex items-center gap-3 px-8 py-3 text-muted transition-colors hover:text-primary" href="#core"><span class="material-symbols-outlined text-sm">stars</span><span id="side-core">Core Personality</span></a>
+        <a class="side-link flex items-center gap-3 px-8 py-3 text-muted transition-colors hover:text-primary" href="#emotional"><span class="material-symbols-outlined text-sm">water_drop</span><span id="side-emotional">Emotional World</span></a>
+        <a class="side-link flex items-center gap-3 px-8 py-3 text-muted transition-colors hover:text-primary" href="#relationship"><span class="material-symbols-outlined text-sm">favorite</span><span id="side-relationship">Relationship</span></a>
+        <a class="side-link flex items-center gap-3 px-8 py-3 text-muted transition-colors hover:text-primary" href="#social"><span class="material-symbols-outlined text-sm">forum</span><span id="side-social">Social Style</span></a>
+        <a class="side-link flex items-center gap-3 px-8 py-3 text-muted transition-colors hover:text-primary" href="#talents"><span class="material-symbols-outlined text-sm">psychology</span><span id="side-talents">Natural Talents</span></a>
+        <a class="side-link flex items-center gap-3 px-8 py-3 text-muted transition-colors hover:text-primary" href="#career"><span class="material-symbols-outlined text-sm">work</span><span id="side-career">Career Path</span></a>
+        <a class="side-link flex items-center gap-3 px-8 py-3 text-muted transition-colors hover:text-primary" href="#wealth"><span class="material-symbols-outlined text-sm">payments</span><span id="side-wealth">Financial Pattern</span></a>
+        <a class="side-link flex items-center gap-3 px-8 py-3 text-muted transition-colors hover:text-primary" href="#cycles"><span class="material-symbols-outlined text-sm">schedule</span><span id="side-cycles">Life Cycles</span></a>
+        <a class="side-link flex items-center gap-3 px-8 py-3 text-muted transition-colors hover:text-primary" href="#growth"><span class="material-symbols-outlined text-sm">trending_up</span><span id="side-growth">Growth Path</span></a>
+        <a class="side-link flex items-center gap-3 px-8 py-3 text-muted transition-colors hover:text-primary" href="#energy"><span class="material-symbols-outlined text-sm">balance</span><span id="side-energy">Energy Balance</span></a>
+        <a class="side-link flex items-center gap-3 px-8 py-3 text-muted transition-colors hover:text-primary" href="#compatibility"><span class="material-symbols-outlined text-sm">diversity_3</span><span id="side-compatibility">Compatibility</span></a>
+        <a class="side-link flex items-center gap-3 px-8 py-3 text-muted transition-colors hover:text-primary" href="#guidance"><span class="material-symbols-outlined text-sm">auto_awesome</span><span id="side-guidance">Final Guidance</span></a>
+      </nav>
+    </aside>
+
+    <main class="px-6 pb-32 pt-24 md:px-12 lg:ml-64 lg:px-24">
+      <header class="mx-auto mb-24 max-w-4xl text-center">
+        <div class="mb-6 inline-block rounded-full border border-primary/30 px-4 py-1">
+          <span class="font-label text-[10px] uppercase tracking-[0.4em] text-primary" id="premium-eyebrow">Confidential Manuscript</span>
+        </div>
+        <h1 class="ink-text-shadow mb-6 font-headline text-5xl font-bold leading-[1.1] tracking-tighter md:text-7xl" id="premium-heading">
+          Unlock Your Full <br /><span class="italic text-primary">Destiny Report</span>
+        </h1>
+        <p class="mx-auto max-w-2xl text-lg leading-relaxed text-muted/80" id="premium-meta"></p>
+        <p class="mt-6 text-[10px] uppercase tracking-[0.35em] text-secondary/55" id="premium-disclaimer">For entertainment purposes only.</p>
+      </header>
+
+      <div class="space-y-32" id="premium-sections"></div>
+    </main>
+
+    <div class="fixed bottom-0 left-0 z-50 flex w-full items-center justify-around border-t border-outline/30 bg-background/90 px-6 pb-6 pt-2 backdrop-blur-2xl lg:hidden">
+      <a class="flex flex-col items-center justify-center text-secondary opacity-50 transition-opacity hover:opacity-100" href="#core">
+        <span class="material-symbols-outlined">auto_graph</span>
+        <span class="font-label text-[8px] font-bold uppercase tracking-widest" id="mobile-chart">Chart</span>
+      </a>
+      <a class="mb-6 flex -translate-y-4 flex-col items-center justify-center rounded-full bg-primary p-4 text-[#11131c] transition-transform active:scale-90" href="#guidance">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">auto_stories</span>
+      </a>
+      <a class="flex flex-col items-center justify-center text-secondary opacity-50 transition-opacity hover:opacity-100" href="#cycles">
+        <span class="material-symbols-outlined">schedule</span>
+        <span class="font-label text-[8px] font-bold uppercase tracking-widest" id="mobile-cycles">Cycles</span>
+      </a>
+      <a class="flex flex-col items-center justify-center text-secondary opacity-50 transition-opacity hover:opacity-100" href="./result.html">
+        <span class="material-symbols-outlined">person</span>
+        <span class="font-label text-[8px] font-bold uppercase tracking-widest" id="mobile-profile">Profile</span>
+      </a>
+    </div>
+
+    <div class="px-6 pb-4 text-center text-xs tracking-[0.04em] text-secondary/60 lg:ml-64 lg:px-24" id="premium-bottom-note">
+      This test result is for entertainment only and does not constitute any professional interpretation.
+    </div>
+
+    <footer class="w-full border-t border-secondary/10 bg-[#11131c] py-12">
+      <div class="flex w-full flex-col items-center gap-6 px-8">
+        <div class="mb-4 font-headline text-3xl italic text-primary">BaziChart</div>
+        <div class="text-center text-xs tracking-[0.08em] text-secondary/70" id="footer-contact">For any information, please contact: anqid02@gmail.com</div>
+        <div class="mt-8 text-xs uppercase tracking-[0.3em] text-secondary" id="footer-copy">© 2026 BaziChart. Etched in the stars.</div>
+      </div>
+    </footer>
+
+    <script src="./lunar.min.js"></script>
+    <script src="./shared.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="./premium.js"></script>
+  </body>
+</html>
