@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Your Bazi Result | BaziChart</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#e9c349",
+              secondary: "#adcbd6",
+              tertiary: "#dab9ff",
+              background: "#11131c",
+              surface: "#11131c",
+              panel: "#1d1f29",
+              low: "#191b24",
+              high: "#282933",
+              highest: "#32343e",
+              outline: "#46464c",
+              text: "#e1e1ef",
+              muted: "#c7c5cc",
+              error: "#ffb4ab",
+            },
+            fontFamily: {
+              headline: ["Cormorant Garamond", "serif"],
+              body: ["Manrope", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        background-color: #11131c;
+        color: #e1e1ef;
+        font-family: "Manrope", sans-serif;
+      }
+
+      .material-symbols-outlined {
+        font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+      }
+
+      .bg-celestial {
+        background-image: radial-gradient(circle at 2px 2px, rgba(233, 195, 73, 0.05) 1px, transparent 0);
+        background-size: 40px 40px;
+      }
+
+      .glass-panel {
+        background: rgba(25, 27, 36, 0.6);
+        backdrop-filter: blur(12px);
+      }
+
+      .lang-pill {
+        border: 1px solid rgba(233, 195, 73, 0.28);
+        background: rgba(17, 19, 28, 0.66);
+      }
+
+      .lang-pill.is-active {
+        background: rgba(233, 195, 73, 0.16);
+        color: #e9c349;
+      }
+    </style>
+  </head>
+  <body class="bg-celestial selection:bg-primary/30 selection:text-primary">
+    <nav class="fixed inset-x-0 top-0 z-50 bg-[#11131c]/80 backdrop-blur-xl shadow-[0_30px_50px_rgba(12,14,23,0.45)]">
+      <div class="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 md:px-8">
+        <a class="font-headline text-3xl font-semibold italic tracking-wide text-primary" href="./index.html">BaziChart</a>
+        <div class="hidden items-center gap-8 md:flex">
+          <a class="font-headline tracking-wide text-secondary transition-colors hover:text-tertiary" id="nav-calculator" href="./index.html">Home</a>
+          <a class="font-headline tracking-wide text-secondary transition-colors hover:text-tertiary" id="nav-knowledge" href="./knowledge.html">Knowledge</a>
+          <a class="border-b border-primary pb-1 font-headline tracking-wide text-primary" id="nav-generate" href="./result.html">Generate Chart</a>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2">
+            <button class="lang-pill rounded-full px-3 py-1.5 text-sm font-semibold text-secondary transition" data-lang-switch="en" type="button">English</button>
+            <button class="lang-pill rounded-full px-3 py-1.5 text-sm font-semibold text-secondary transition" data-lang-switch="zh" type="button">中文</button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="mx-auto max-w-7xl space-y-8 px-6 py-12 pt-28">
+      <header class="mb-16 space-y-4 text-center">
+        <span class="text-xs uppercase tracking-[0.2em] text-tertiary" id="result-eyebrow">Analysis Complete</span>
+        <h1 class="font-headline text-5xl text-text md:text-7xl" id="result-heading">Your Celestial Manuscript</h1>
+        <p class="mx-auto max-w-3xl text-lg text-secondary" id="result-meta">
+          The convergence of Western constellations and Eastern elements, deciphered specifically for your birth moment.
+        </p>
+        <p class="text-xs uppercase tracking-[0.18em] text-secondary/50" id="result-disclaimer">For entertainment purposes only.</p>
+      </header>
+
+      <div class="grid items-stretch gap-8 lg:grid-cols-12">
+        <div class="group relative flex h-full flex-col justify-between overflow-hidden rounded-xl bg-low p-8 lg:col-span-4">
+          <div class="absolute -right-10 -top-10 opacity-10 transition-opacity group-hover:opacity-20">
+            <span class="material-symbols-outlined text-[12rem] text-primary" style="font-variation-settings: 'FILL' 1">brightness_low</span>
+          </div>
+          <div class="space-y-6">
+            <div class="flex items-center gap-4">
+              <span class="material-symbols-outlined text-4xl text-primary" style="font-variation-settings: 'FILL' 1">brightness_low</span>
+              <div>
+                <h2 class="font-headline text-3xl" id="western-sign-name">-</h2>
+                <p class="text-sm uppercase tracking-[0.2em] text-secondary" id="western-topline">Solar Identity</p>
+              </div>
+            </div>
+            <p class="leading-relaxed text-muted" id="western-sign-summary"></p>
+          </div>
+          <div class="relative mx-auto mt-6 h-32 w-32">
+            <img
+              alt="Natal Chart"
+              class="h-full w-full rounded-full border border-primary/20 p-2 object-cover opacity-80"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTGFEsHbF_s6jIXINDGOWKWac8rLkFyG1ft9nGLjvJdY9LPOsC-16jpFpADybHz97geqXkRIMYRxushfQh9r1h7R_H3ao3RhET63WsthKHDDdpeO9iNcE0gal2kbrBHGkM_HDY-DSHVooaTCtz_umumSsAPw1OqupO0rlWg6DNiOym_Y-tRewf8rdNv3UY9-4aOlJWvoPg7uVVwtCZL-wT8aCvZ0VysQ3EaN74UN9_Ygm2SWRtYhZvSH60LE7KVIMB0CS2PDXR3bE"
+            />
+            <div class="absolute inset-0 animate-[spin_60s_linear_infinite] rounded-full border-2 border-dashed border-primary/30"></div>
+          </div>
+        </div>
+
+        <div class="flex h-full flex-col justify-center rounded-xl border border-outline/20 bg-panel p-8 lg:col-span-8">
+          <div class="flex items-start gap-6">
+            <div class="hidden h-20 w-20 shrink-0 items-center justify-center rounded-full border border-primary/30 bg-[#1b1400] sm:flex">
+              <span class="material-symbols-outlined text-5xl text-primary">auto_stories</span>
+            </div>
+            <div class="space-y-4">
+              <h3 class="flex items-center gap-3 font-headline text-3xl">
+                <span class="material-symbols-outlined text-primary">auto_stories</span>
+                <span id="western-card-title">Western Zodiac</span>
+              </h3>
+              <p class="leading-relaxed text-muted" id="compare-summary"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <section class="w-full">
+        <div class="rounded-xl border border-outline/20 bg-panel p-8">
+          <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p class="mb-2 text-sm uppercase tracking-[0.25em] text-primary" id="bazi-topline">Bazi Chart</p>
+              <h3 class="flex items-center gap-3 font-headline text-3xl">
+                <span class="material-symbols-outlined text-primary">grid_view</span>
+                <span id="bazi-title">The Four Pillars of Destiny</span>
+              </h3>
+            </div>
+            <p class="max-w-2xl text-sm leading-relaxed text-muted" id="bazi-help">Each pillar represents a different dimension of timing, personality, and life structure.</p>
+          </div>
+
+          <div class="flex gap-4">
+            <div class="hidden w-28 shrink-0 pt-14 sm:flex sm:flex-col">
+              <div class="flex h-24 items-center justify-end pr-4">
+                <span class="block w-full text-right text-[11px] font-bold uppercase tracking-[0.15em] text-secondary" id="th-layer-stem">Heavenly Stem</span>
+              </div>
+              <div class="flex h-24 items-center justify-end pr-4">
+                <span class="block w-full text-right text-[11px] font-bold uppercase tracking-[0.15em] text-secondary" id="th-layer-branch">Earthly Branch</span>
+              </div>
+            </div>
+            <div class="grid flex-grow grid-cols-4 gap-3 sm:gap-4" id="pillar-grid"></div>
+          </div>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+        <section class="rounded-xl border border-outline/20 bg-low p-8">
+          <div class="mb-6">
+            <p class="mb-2 text-sm uppercase tracking-[0.25em] text-primary" id="hidden-topline">Deeper Influences</p>
+            <h3 class="font-headline text-3xl" id="hidden-title">Deeper Influences in Your Chart</h3>
+            <p class="mt-3 text-sm leading-relaxed text-muted" id="hidden-help">Each pillar carries hidden stems and a different psychological emphasis.</p>
+          </div>
+          <div class="space-y-4" id="hidden-grid"></div>
+        </section>
+
+        <section class="rounded-xl border border-outline/20 bg-low p-8">
+          <div class="mb-6">
+            <p class="mb-2 text-sm uppercase tracking-[0.25em] text-primary" id="elements-topline">Five Elements Balance</p>
+            <h3 class="font-headline text-3xl" id="elements-title">Your Energy Distribution</h3>
+            <p class="mt-3 text-sm leading-relaxed text-muted" id="elements-summary"></p>
+          </div>
+
+          <div class="grid gap-8 lg:grid-cols-[220px,1fr]">
+            <div class="relative mx-auto h-[220px] w-[220px]">
+              <div class="h-full w-full rounded-full" id="elements-wheel"></div>
+              <div class="absolute inset-[34px] rounded-full border border-white/10 bg-background/90"></div>
+              <div class="absolute inset-0 z-10 grid place-items-center px-10 text-center font-semibold" id="elements-wheel-center"></div>
+            </div>
+            <div class="space-y-4" id="elements-bars"></div>
+          </div>
+
+          <div class="mt-6 grid gap-4" id="element-insight-grid"></div>
+          <div class="mt-6 grid gap-4 sm:grid-cols-2" id="element-explain-grid"></div>
+        </section>
+      </div>
+
+      <section class="space-y-12 pt-8">
+        <div class="flex items-end justify-between border-b border-outline/20 pb-6">
+          <h2 class="font-headline text-4xl" id="summary-title">Your Core Personality</h2>
+          <span class="text-sm italic text-primary/60" id="summary-topline">The Internal Alchemy</span>
+        </div>
+        <div class="space-y-6" id="personality-traits"></div>
+      </section>
+
+      <section class="space-y-12">
+        <div class="flex items-end justify-between border-b border-outline/20 pb-6">
+          <h2 class="font-headline text-4xl" id="premium-title">Destiny Directions</h2>
+          <div class="flex items-center gap-2 text-tertiary">
+            <span class="material-symbols-outlined text-sm">lock</span>
+            <span class="text-xs font-bold uppercase tracking-[0.2em]" id="premium-topline">Premium Access</span>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
+          <div class="relative">
+            <div class="select-none rounded-xl bg-low p-8 opacity-40 blur-sm">
+              <div class="mb-6 h-12 w-12 rounded-full bg-panel"></div>
+              <h4 class="font-headline text-xl">Love Compatibility</h4>
+              <div class="mt-4 space-y-2">
+                <div class="h-3 w-full rounded bg-highest"></div>
+                <div class="h-3 w-4/5 rounded bg-highest"></div>
+                <div class="h-3 w-full rounded bg-highest"></div>
+              </div>
+            </div>
+            <div class="absolute inset-0 flex flex-col items-center justify-center space-y-4">
+              <div class="flex h-12 w-12 items-center justify-center rounded-full border border-tertiary/30 bg-highest">
+                <span class="material-symbols-outlined text-tertiary">favorite</span>
+              </div>
+              <span class="rounded-full bg-tertiary/20 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-tertiary">Full Report Only</span>
+            </div>
+          </div>
+          <div class="relative">
+            <div class="select-none rounded-xl bg-low p-8 opacity-40 blur-sm">
+              <div class="mb-6 h-12 w-12 rounded-full bg-panel"></div>
+              <h4 class="font-headline text-xl">Career Path</h4>
+              <div class="mt-4 space-y-2">
+                <div class="h-3 w-full rounded bg-highest"></div>
+                <div class="h-3 w-4/5 rounded bg-highest"></div>
+                <div class="h-3 w-full rounded bg-highest"></div>
+              </div>
+            </div>
+            <div class="absolute inset-0 flex flex-col items-center justify-center space-y-4">
+              <div class="flex h-12 w-12 items-center justify-center rounded-full border border-primary/30 bg-highest">
+                <span class="material-symbols-outlined text-primary">work</span>
+              </div>
+              <span class="rounded-full bg-primary/20 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Full Report Only</span>
+            </div>
+          </div>
+          <div class="relative">
+            <div class="select-none rounded-xl bg-low p-8 opacity-40 blur-sm">
+              <div class="mb-6 h-12 w-12 rounded-full bg-panel"></div>
+              <h4 class="font-headline text-xl">Wealth Potential</h4>
+              <div class="mt-4 space-y-2">
+                <div class="h-3 w-full rounded bg-highest"></div>
+                <div class="h-3 w-4/5 rounded bg-highest"></div>
+                <div class="h-3 w-full rounded bg-highest"></div>
+              </div>
+            </div>
+            <div class="absolute inset-0 flex flex-col items-center justify-center space-y-4">
+              <div class="flex h-12 w-12 items-center justify-center rounded-full border border-secondary/30 bg-highest">
+                <span class="material-symbols-outlined text-secondary">payments</span>
+              </div>
+              <span class="rounded-full bg-secondary/20 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-secondary">Full Report Only</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="relative overflow-hidden rounded-2xl border border-primary/20 bg-[#1b1400] p-12">
+        <div class="absolute right-0 top-0 h-full w-1/3 opacity-10">
+          <img
+            alt="Background"
+            class="h-full w-full object-cover grayscale"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBGfe88HfwheD181_UKFNmzJQTRuyG2rNw1da3oFCqal5Z_Bmde0xtE_XmgfYormhbNGNbauupoSAFPk-p6bFWVWDtZXMSOBiAaTlME6HK9fzrMRV4LYyWlrEKPhmEVjZUrjy613MAT8XH2uUIDc3aNe1JU05EnjV_a9H6MNMflslbzdeEK5YHGH8GhdcUCKPpOxN4Qy-BVHhKfcyAw5eNrAD1ghH0S-G0r1rFGsGwLPlMI-AwfVNoIZHGJBhOK1u0Ztd2_32wwdI"
+          />
+        </div>
+        <div class="relative z-10 grid gap-12 lg:grid-cols-2 lg:items-center">
+          <div class="space-y-8">
+            <h2 class="font-headline text-4xl leading-tight text-primary" id="premium-title-main">Unlock Your Full Destiny Report</h2>
+            <ul class="space-y-4">
+              <li class="flex items-center gap-3 text-text"><span class="material-symbols-outlined text-xl text-primary">check_circle</span><span id="premium-item-1">Detailed personality analysis</span></li>
+              <li class="flex items-center gap-3 text-text"><span class="material-symbols-outlined text-xl text-primary">check_circle</span><span id="premium-item-2">Element balance interpretation</span></li>
+              <li class="flex items-center gap-3 text-text"><span class="material-symbols-outlined text-xl text-primary">check_circle</span><span id="premium-item-3">Relationship compatibility</span></li>
+              <li class="flex items-center gap-3 text-text"><span class="material-symbols-outlined text-xl text-primary">check_circle</span><span id="premium-item-4">Career tendencies</span></li>
+              <li class="flex items-center gap-3 text-text"><span class="material-symbols-outlined text-xl text-primary">check_circle</span><span id="premium-item-5">10-year energy cycles</span></li>
+              <li class="flex items-center gap-3 text-text"><span class="material-symbols-outlined text-xl text-primary">check_circle</span><span id="premium-item-6">Downloadable report</span></li>
+            </ul>
+          </div>
+          <div class="glass-panel space-y-8 rounded-xl border border-primary/20 p-10 text-center">
+            <div class="space-y-2">
+              <div class="text-xs uppercase tracking-[0.3em] text-secondary">Special Invitation</div>
+              <div class="font-headline text-5xl text-text">$9.99</div>
+              <div class="text-sm text-muted line-through">$49.99</div>
+            </div>
+            <button class="w-full rounded-full bg-gradient-to-r from-primary to-[#574500] py-4 text-lg font-bold text-[#241a00] transition-all duration-200 hover:shadow-[0_0_30px_rgba(233,195,73,0.3)] active:scale-95" id="premium-cta" type="button">
+              Get Full Report Now
+            </button>
+            <div class="space-y-4">
+              <p class="text-xs uppercase tracking-[0.3em] text-muted">Secure Checkout</p>
+              <div class="flex items-center justify-center gap-6 opacity-60">
+                <div class="flex items-center gap-1"><span class="material-symbols-outlined text-xl">credit_card</span><span class="text-sm font-bold">Stripe</span></div>
+                <div class="flex items-center gap-1"><span class="material-symbols-outlined text-xl">account_balance_wallet</span><span class="text-sm font-bold">PayPal</span></div>
+                <div class="flex items-center gap-1"><span class="material-symbols-outlined text-xl">ios</span><span class="text-sm font-bold">Pay</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <p class="pb-4 text-center text-xs tracking-[0.04em] text-secondary/60" id="result-bottom-note">
+        This test result is for entertainment only and does not constitute any professional interpretation.
+      </p>
+    </main>
+
+    <footer class="w-full border-t border-secondary/10 bg-[#11131c] py-12">
+      <div class="flex w-full flex-col items-center gap-6 px-8">
+        <div class="mb-4 font-headline text-3xl italic text-primary">BaziChart</div>
+        <div class="text-center text-xs tracking-[0.08em] text-secondary/70" id="footer-contact">For any information, please contact: anqid02@gmail.com</div>
+        <div class="mt-8 text-xs uppercase tracking-[0.3em] text-secondary" id="footer-copy">© 2026 BaziChart. Etched in the stars.</div>
+      </div>
+    </footer>
+
+    <script src="./lunar.min.js"></script>
+    <script src="./shared.js"></script>
+    <script src="./result.js"></script>
+  </body>
+</html>
