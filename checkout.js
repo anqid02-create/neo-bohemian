@@ -195,7 +195,7 @@ function unlockAndRedirect(email, captureDetails) {
   const nextParams = new URLSearchParams({
     date,
     time,
-    location,
+    location: birthLocation,
     unlocked: "1",
     lang: currentLang,
   });
@@ -237,8 +237,8 @@ function renderPayPal(currentConfig, lang) {
         createOrder(data, actions) {
           const description =
             lang === "zh"
-              ? `BaziChart 深度报告 · ${location || "命盘用户"} · ${date} ${time}`
-              : `BaziChart Premium Report · ${location || "Chart User"} · ${date} ${time}`;
+              ? `BaziChart 深度报告 · ${birthlocation || "命盘用户"} · ${date} ${time}`
+              : `BaziChart Premium Report · ${birthlocation || "Chart User"} · ${date} ${time}`;
 
           return actions.order.create({
             purchase_units: [
@@ -288,7 +288,7 @@ function applyLanguage(lang) {
   setText("nav-generate", t.navGenerate);
   if (navGenerateLink) {
     navGenerateLink.href = date
-      ? `./result.html?${new URLSearchParams({ date, time, location, lang }).toString()}`
+      ? `./result.html?${new URLSearchParams({ date, time, birthlocation, lang }).toString()}`
       : "./index.html#calculator";
   }
   setText("checkout-eyebrow", t.eyebrow);
