@@ -217,42 +217,56 @@ function renderPayPal(currentConfig, lang) {
   if (!paypalButtonContainer) return;
 
   paypal.Buttons({
+    createOrder: async () => {
+      try {
+        const response = await fetch("/api/create-order", {
+          method: "POST"
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const order = await response.json();
+        return order.id;
+      } catch (err) {
+        console.error("createOrder error:", err);
+        setStatus(paypalStatus, t.failed, true);
+        throw err;
+      }
+    },
 
-  createOrder: async () => {
-    const response = await fetch("/api/create-order", {
-      method: "POST"
-    });
+    onApprove: async (data) => {
+      try {
+        const response = await fetch("/api/capture-order", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            orderID: data.orderID
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const capture = await response.json();
+        console.log("PAYMENT SUCCESS", capture);
+        window.location.href = "/premium-report.html";
+      } catch (err) {
+        console.error("onApprove error:", err);
+        setStatus(paypalStatus, t.failed, true);
+      }
+    },
 
-    const order = await response.json();
-
-    return order.id;   // 关键：必须 return order.id
-  },
-
-  onApprove: async (data) => {
-    const response = await fetch("/api/capture-order", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        orderID: data.orderID
-      })
-    });
-
-    const capture = await response.json();
-
-    console.log("PAYMENT SUCCESS", capture);
-
-    window.location.href = "/premium.html";
-  }
-
-}).render("#paypal-button-container");
-    .catch((err) => {
-      console.error(err);
+    onError: (err) => {
+      console.error("PayPal error:", err);
       setStatus(paypalStatus, t.failed, true);
-    });
+    }
+  }).render("#paypal-button-container");
 }
-
 function applyLanguage(lang) {
   currentLang = lang;
   const t = translations[lang];
