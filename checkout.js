@@ -214,62 +214,81 @@ function unlockAndRedirect(email, captureDetails) {
 
 function renderPayPal(currentConfig, lang) {
   const t = translations[lang];
-  if (!paypalButtonContainer) return;
+  if (!paypalButtonContainer) {
+    console.error("找不到 paypal-button-container 元素");
+    return;
+  }
 
-  paypal.Buttons({
-    createOrder: async () => {
-      try {
-        const response = await fetch("/api/create-order", {
-          method: "POST"
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  try {
+    paypal.Buttons({
+      createOrder: async () => {
+        try {
+          const response = await fetch("/api/create-order", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            }
+          });
+          
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`创建订单失败 (${response.status}): ${errorText}`);
+          }
+          
+          const order = await response.json();
+          
+          if (!order.id) {
+            throw new Error("返回的订单数据中没有 order.id");
+          }
+          
+          return order.id;
+        } catch (err) {
+          console.error("createOrder 错误:", err);
+          setStatus(paypalStatus, t.failed || "支付初始化失败", true);
+          throw err;
         }
-        
-        const order = await response.json();
-        return order.id;
-      } catch (err) {
-        console.error("创建订单失败:", err);
-        setStatus(paypalStatus, t.failed, true);
-        throw err; // 重新抛出错误，让PayPal显示错误信息
-      }
-    },
+      },
 
-    onApprove: async (data) => {
-      try {
-        const response = await fetch("/api/capture-order", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            orderID: data.orderID
-          })
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      onApprove: async (data) => {
+        try {
+          const response = await fetch("/api/capture-order", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              orderID: data.orderID
+            })
+          });
+          
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`捕获订单失败 (${response.status}): ${errorText}`);
+          }
+          
+          const capture = await response.json();
+          console.log("支付成功:", capture);
+          
+          // 可选：保存支付信息
+          sessionStorage.setItem('paymentCompleted', 'true');
+          sessionStorage.setItem('paymentDetails', JSON.stringify(capture));
+          
+          window.location.href = "/premium-report.html";
+        } catch (err) {
+          console.error("onApprove 错误:", err);
+          setStatus(paypalStatus, t.failed || "支付处理失败", true);
         }
-        
-        const capture = await response.json();
-        console.log("Payment success:", capture);
-        
-        // 可选：保存订单信息到 localStorage
-        localStorage.setItem('lastPayment', JSON.stringify(capture));
-        
-        window.location.href = "/premium-report.html";
-      } catch (err) {
-        console.error("捕获订单失败:", err);
-        setStatus(paypalStatus, t.failed, true);
-      }
-    },
+      },
 
-    onError: (err) => {
-      console.error("PayPal error:", err);
-      setStatus(paypalStatus, t.failed, true);
-    }
-  }).render("#paypal-button-container");  // ✅ 这里只有一个 ).render
+      onError: (err) => {
+        console.error("PayPal 按钮错误:", err);
+        setStatus(paypalStatus, t.failed || "PayPal 加载失败，请刷新页面重试", true);
+      }
+    }).render("#paypal-button-container");
+  } catch (err) {
+    console.error("初始化 PayPal 按钮失败:", err);
+    setStatus(paypalStatus, t.failed || "支付组件初始化失败", true);
+  }
 }
 function applyLanguage(lang) {
   currentLang = lang;
