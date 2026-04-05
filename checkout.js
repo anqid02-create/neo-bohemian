@@ -247,7 +247,6 @@ function renderPayPal(currentConfig, lang) {
   }
 
 }).render("#paypal-button-container");
-    })
     .catch((err) => {
       console.error(err);
       setStatus(paypalStatus, t.failed, true);
