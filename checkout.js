@@ -10,33 +10,24 @@ const paypalConfigHelp = document.getElementById("paypal-config-help");
 const navGenerateLink = document.getElementById("nav-generate");
 
 let currentLang = window.BaziChart.getLanguage();
-let paypalRenderPromise = null;
 
 const translations = {
   en: {
     navCalculator: "Home",
     navKnowledge: "Knowledge",
-    navPremium: "Premium Report",
     navGenerate: "Generate Chart",
     eyebrow: "Premium Checkout",
     title: "Unlock Your Full Destiny Report",
-    summary: `You are unlocking the premium manuscript for ${birthLocation} on ${date} at ${time}. Pay once with PayPal and continue directly into the full report.`,
+    summary: `You are unlocking the premium manuscript for ${birthLocation} on ${date} at ${time}.`,
     whatTopline: "Premium Access",
     whatTitle: "What You'll Get",
     itemLabel: "Included",
-    items: [
-      "Core Personality Blueprint",
-      "Emotional World",
-      "Talent & Natural Abilities",
-      "Career & Professional Path",
-    ],
+    items: ["Core Personality Blueprint", "Emotional World", "Talent & Natural Abilities", "Career & Professional Path"],
     ellipsisLabel: "And More",
     ellipsisSymbol: "...",
-    ellipsisCopy:
-      "Life cycles, compatibility, final guidance, and the rest of your premium manuscript continue inside the full report.",
+    ellipsisCopy: "Life cycles, compatibility, final guidance, and more.",
     trustTitle: "Secure report delivery",
-    trustCopy:
-      "Your PayPal approval unlocks the premium page immediately and keeps your current chart context attached.",
+    trustCopy: "Your PayPal approval unlocks the premium page immediately.",
     trustTop1: "Payment",
     trust1: "Processed with PayPal",
     trustTop2: "Access",
@@ -49,83 +40,52 @@ const translations = {
     emailLabel: "Email",
     paypalTitle: "Pay with PayPal",
     paypalSubtitle: "Smart Buttons Checkout",
-    paypalNote:
-      "Complete your payment with PayPal and we will unlock your full report immediately.",
-    note:
-      "This checkout uses PayPal. Sandbox mode is enabled automatically until you replace the Client ID with your live one.",
+    paypalNote: "Complete your payment with PayPal.",
+    note: "Secure payment powered by PayPal.",
     disclaimer: "For entertainment purposes only.",
     footerContact: "For any information, please contact: anqid02@gmail.com",
     footerCopy: "© 2026 BaziChart. Etched in the stars.",
-    configMissing:
-      "PayPal sandbox test mode is active. Replace the Client ID in checkout.html when you're ready to switch to your real account.",
-    blocked:
-      "Please enter a valid email before continuing to PayPal. We use it to attach your unlocked report to this session.",
-    loading: "Loading PayPal checkout...",
-    ready: "PayPal is ready. Approve the payment to unlock your premium report.",
-    processing: "Completing your PayPal payment...",
-    success: "Payment approved. Redirecting to your premium report...",
-    cancelled:
-      "PayPal checkout was cancelled. Your report remains locked until payment is approved.",
-    failed:
-      "We couldn't initialize PayPal on this page. Please check your Client ID and try again.",
-    captureFailed:
-      "PayPal returned an error while finalizing the payment. Please try again.",
+    failed: "Payment failed. Please try again.",
+    loading: "Loading PayPal...",
+    success: "Success! Redirecting..."
   },
   zh: {
-    navCalculator: "Home",
+    navCalculator: "首页",
     navKnowledge: "知识",
-    navPremium: "深度报告",
     navGenerate: "生成命盘",
     eyebrow: "高级支付",
     title: "解锁完整深度命盘报告",
-    summary: `你正在为 ${birthLocation}（${date} ${time}）解锁完整高级手稿。通过 PayPal 完成一次支付后，将直接进入完整版报告。`,
+    summary: `您正在为 ${birthLocation}（${date} ${time}）解锁完整报告。`,
     whatTopline: "高级权限",
-    whatTitle: "你将获得",
+    whatTitle: "您将获得",
     itemLabel: "包含内容",
-    items: [
-      "Core Personality Blueprint",
-      "Emotional World",
-      "Talent & Natural Abilities",
-      "Career & Professional Path",
-    ],
+    items: ["核心性格蓝图", "情感世界解析", "天赋与潜能", "事业发展路径"],
     ellipsisLabel: "更多内容",
     ellipsisSymbol: "...",
-    ellipsisCopy:
-      "人生周期、匹配概览、最终指引以及更多深度内容，都将在完整版报告里继续展开。",
+    ellipsisCopy: "人生周期、匹配概览、最终指引等更多内容。",
     trustTitle: "安全交付",
-    trustCopy:
-      "PayPal 支付成功后会立刻解锁高级页面，并保留你当前这份命盘上下文。",
+    trustCopy: "PayPal 支付成功后立即解锁高级页面。",
     trustTop1: "支付",
-    trust1: "由 PayPal 处理",
+    trust1: "PayPal 安全支付",
     trustTop2: "解锁",
-    trust2: "支付通过后立即开放",
-    trustTop3: "形式",
-    trust3: "高级命理手稿体验",
+    trust2: "支付后立即开放",
+    trustTop3: "格式",
+    trust3: "高级命理手稿",
     priceTopline: "一次性支付",
     priceNote: "单次购买，立即解锁。",
     status: "PayPal 支付",
     emailLabel: "邮箱",
-    paypalTitle: "通过 PayPal 支付",
+    paypalTitle: "PayPal 支付",
     paypalSubtitle: "智能按钮结账",
-    paypalNote:
-      "完成 PayPal 支付后，我们会立即为你解锁完整报告。",
-    note:
-      "当前页面已接入 PayPal。在你替换成正式 Client ID 之前，会默认使用 sandbox 测试模式。",
-    disclaimer: "此结果仅供娱乐。",
-    footerContact: "For any information, please contact: anqid02@gmail.com",
+    paypalNote: "完成 PayPal 支付后立即解锁。",
+    note: "由 PayPal 提供安全支付支持。",
+    disclaimer: "仅供娱乐参考。",
+    footerContact: "联系我们: anqid02@gmail.com",
     footerCopy: "© 2026 BaziChart. 星图已启。",
-    configMissing:
-      "当前已启用 PayPal sandbox 测试模式。等你准备上线时，再把 checkout.html 里的 Client ID 替换成正式账号即可。",
-    blocked:
-      "请先填写有效邮箱，再继续跳转 PayPal。我们会用它来关联本次解锁状态。",
-    loading: "正在加载 PayPal 支付组件...",
-    ready: "PayPal 已就绪，完成支付后会自动解锁高级报告。",
-    processing: "正在确认你的 PayPal 支付...",
-    success: "支付成功，正在跳转到高级报告...",
-    cancelled: "你已取消 PayPal 支付，报告仍保持未解锁状态。",
-    failed: "当前页面无法初始化 PayPal。请检查 Client ID 后重试。",
-    captureFailed: "PayPal 在完成支付时返回了错误，请稍后再试。",
-  },
+    failed: "支付失败，请重试。",
+    loading: "加载中...",
+    success: "支付成功！跳转中..."
+  }
 };
 
 function setText(id, value) {
@@ -133,83 +93,20 @@ function setText(id, value) {
   if (node) node.textContent = value;
 }
 
-function setStatus(target, message, visible) {
+function setStatus(target, message, isError) {
   if (!target) return;
   target.textContent = message || "";
-  target.classList.toggle("hidden", !visible);
+  target.classList.remove("hidden");
 }
 
 function getCheckoutConfig() {
   const inlineConfig = window.BaziChartCheckoutConfig || {};
-  const urlClientId = params.get("paypalClientId");
-  const urlCurrency = params.get("currency");
-
   return {
-    clientId: urlClientId || inlineConfig.paypalClientId || "sb",
-    currency: urlCurrency || inlineConfig.currency || "USD",
+    clientId: inlineConfig.paypalClientId || "sb",
+    currency: inlineConfig.currency || "USD",
     amount: inlineConfig.amount || "9.99",
     intent: inlineConfig.intent || "capture",
   };
-}
-
-function hasRealClientId(clientId) {
-  return Boolean(clientId && !clientId.includes("YOUR_PAYPAL_CLIENT_ID"));
-}
-
-function loadPayPalSdk(config) {
-  if (window.paypal) {
-    return Promise.resolve(window.paypal);
-  }
-
-  if (paypalRenderPromise) {
-    return paypalRenderPromise;
-  }
-
-  paypalRenderPromise = new Promise((resolve, reject) => {
-    const script = document.createElement("script");
-    const sdkUrl = new URL("https://www.paypal.com/sdk/js");
-    sdkUrl.searchParams.set("client-id", config.clientId);
-    sdkUrl.searchParams.set("currency", config.currency);
-    sdkUrl.searchParams.set("intent", config.intent);
-    sdkUrl.searchParams.set("components", "buttons");
-    script.src = sdkUrl.toString();
-    script.async = true;
-    script.onload = () => {
-      if (window.paypal) {
-        resolve(window.paypal);
-      } else {
-        reject(new Error("paypal-sdk-missing"));
-      }
-    };
-    script.onerror = () => reject(new Error("paypal-sdk-load-failed"));
-    document.head.appendChild(script);
-  });
-
-  return paypalRenderPromise;
-}
-
-function unlockAndRedirect(email, captureDetails) {
-  sessionStorage.setItem(
-    "bazichart_demo_purchase",
-    JSON.stringify({
-      provider: "paypal",
-      email,
-      paidAt: new Date().toISOString(),
-      reference: captureDetails.id,
-      payerName: captureDetails.payer?.name?.given_name || "",
-      captureDetails,
-    })
-  );
-
-  const nextParams = new URLSearchParams({
-    date,
-    time,
-    location: birthLocation,
-    unlocked: "1",
-    lang: currentLang,
-  });
-
-  window.location.href = `./premium-report.html?${nextParams.toString()}`;
 }
 
 function renderPayPal(currentConfig, lang) {
@@ -218,79 +115,29 @@ function renderPayPal(currentConfig, lang) {
 
   paypal.Buttons({
     createOrder: async () => {
-      try {
-        const response = await fetch("/api/create-order", {
-          method: "POST"
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const order = await response.json();
-        return order.id;
-      } catch (err) {
-        console.error("createOrder error:", err);
-        setStatus(paypalStatus, t.failed, true);
-        throw err;
-      }
+      const response = await fetch("/api/create-order", {
+        method: "POST"
+      });
+      const order = await response.json();
+      return order.id;
     },
-
     onApprove: async (data) => {
-      try {
-        const response = await fetch("/api/capture-order", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            orderID: data.orderID
-          })
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const capture = await response.json();
-        console.log("PAYMENT SUCCESS", capture);
-        window.location.href = "/premium-report.html";
-      } catch (err) {
-        console.error("onApprove error:", err);
-        setStatus(paypalStatus, t.failed, true);
-      }
+      const response = await fetch("/api/capture-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderID: data.orderID })
+      });
+      const capture = await response.json();
+      console.log("PAYMENT SUCCESS", capture);
+      window.location.href = "/premium-report.html";
     },
-
-    const order = await response.json();
-
-    return order.id;   // 关键：必须 return order.id
-  },
-
-  onApprove: async (data) => {
-    const response = await fetch("/api/capture-order", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        orderID: data.orderID
-      })
-    });
-
-    const capture = await response.json();
-
-    console.log("PAYMENT SUCCESS", capture);
-
-    window.location.href = "/premium.html";
-  }
-
-      console.error(err);
     onError: (err) => {
       console.error("PayPal error:", err);
       setStatus(paypalStatus, t.failed, true);
     }
   }).render("#paypal-button-container");
 }
+
 function applyLanguage(lang) {
   currentLang = lang;
   const t = translations[lang];
@@ -299,18 +146,6 @@ function applyLanguage(lang) {
   setText("nav-calculator", t.navCalculator);
   setText("nav-knowledge", t.navKnowledge);
   setText("nav-generate", t.navGenerate);
-
-  if (navGenerateLink) {
-    navGenerateLink.href = date
-      ? `./result.html?${new URLSearchParams({
-          date,
-          time,
-          location: birthLocation,
-          lang,
-        }).toString()}`
-      : "./index.html#calculator";
-  }
-
   setText("checkout-eyebrow", t.eyebrow);
   setText("checkout-title", t.title);
   setText("checkout-summary", t.summary);
@@ -336,9 +171,9 @@ function applyLanguage(lang) {
   setText("footer-contact", t.footerContact);
   setText("footer-copy", t.footerCopy);
 
-  for (let index = 0; index < t.items.length; index += 1) {
-    setText(`checkout-item-${index + 1}-label`, t.itemLabel);
-    setText(`checkout-item-${index + 1}`, t.items[index]);
+  for (let i = 0; i < t.items.length; i++) {
+    setText(`checkout-item-${i + 1}-label`, t.itemLabel);
+    setText(`checkout-item-${i + 1}`, t.items[i]);
   }
 
   setText("checkout-ellipsis-label", t.ellipsisLabel);
