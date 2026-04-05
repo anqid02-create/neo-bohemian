@@ -114,25 +114,33 @@ function renderPayPal(currentConfig, lang) {
   if (!paypalButtonContainer) return;
 
   paypal.Buttons({
-    createOrder: async () => {
-      const response = await fetch("/api/create-order", {
-        method: "POST"
+    createOrder: function(data, actions) {
+      // 直接在客户端创建订单，不需要后端 API
+      return actions.order.create({
+        purchase_units: [{
+          amount: {
+            value: '9.99',  // 固定金额
+            currency_code: 'USD'
+          }
+        }],
+        intent: 'capture'
       });
-      const order = await response.json();
-      return order.id;
     },
-    onApprove: async (data) => {
-      const response = await fetch("/api/capture-order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderID: data.orderID })
+    onApprove: function(data, actions) {
+      // 捕获订单
+      return actions.order.capture().then(function(details) {
+        console.log('支付成功:', details);
+        
+        // 保存支付信息
+        sessionStorage.setItem('paymentCompleted', 'true');
+        sessionStorage.setItem('paymentDetails', JSON.stringify(details));
+        
+        // 跳转到成功页面
+        window.location.href = "/premium-report.html";
       });
-      const capture = await response.json();
-      console.log("PAYMENT SUCCESS", capture);
-      window.location.href = "/premium-report.html";
     },
-    onError: (err) => {
-      console.error("PayPal error:", err);
+    onError: function(err) {
+      console.error('PayPal 错误:', err);
       setStatus(paypalStatus, t.failed, true);
     }
   }).render("#paypal-button-container");
