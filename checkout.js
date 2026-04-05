@@ -261,7 +261,6 @@ function renderPayPal(currentConfig, lang) {
       }
     },
 
-<<<<<<< HEAD
     const order = await response.json();
 
     return order.id;   // 关键：必须 return order.id
@@ -286,10 +285,8 @@ function renderPayPal(currentConfig, lang) {
   }
 
       console.error(err);
-=======
     onError: (err) => {
       console.error("PayPal error:", err);
->>>>>>> c6dd7cc01e1198b48c3270048c830c434b6b6eaf
       setStatus(paypalStatus, t.failed, true);
     }
   }).render("#paypal-button-container");
