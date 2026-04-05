@@ -216,86 +216,37 @@ function renderPayPal(currentConfig, lang) {
   const t = translations[lang];
   if (!paypalButtonContainer) return;
 
-  paypalButtonContainer.innerHTML = "";
-  setStatus(paypalStatus, "", false);
+  paypal.Buttons({
 
-  if (!hasRealClientId(currentConfig.clientId)) {
-    setStatus(paypalConfigHelp, t.configMissing, true);
-  } else {
-    setStatus(paypalConfigHelp, "", false);
+  createOrder: async () => {
+    const response = await fetch("/api/create-order", {
+      method: "POST"
+    });
+
+    const order = await response.json();
+
+    return order.id;   // 关键：必须 return order.id
+  },
+
+  onApprove: async (data) => {
+    const response = await fetch("/api/capture-order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        orderID: data.orderID
+      })
+    });
+
+    const capture = await response.json();
+
+    console.log("PAYMENT SUCCESS", capture);
+
+    window.location.href = "/premium.html";
   }
 
-  setStatus(paypalStatus, t.loading, true);
-
-  loadPayPalSdk(currentConfig)
-    .then((paypal) => {
-      return paypal.Buttons({
-        style: {
-          layout: "vertical",
-          color: "gold",
-          shape: "rect",
-          label: "paypal",
-          height: 48,
-        },
-
-        onClick(data, actions) {
-          const email = emailInput?.value.trim() || "";
-          if (!email || !email.includes("@")) {
-            setStatus(paypalStatus, t.blocked, true);
-            return actions.reject();
-          }
-          setStatus(paypalStatus, t.ready, true);
-          return actions.resolve();
-        },
-
-        createOrder: async () => {
-          const res = await fetch("/api/create-order", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
-
-          const data = await res.json();
-          if (!data.id) {
-            throw new Error("Failed to create PayPal order");
-          }
-          return data.id;
-        },
-
-        onApprove: async (data) => {
-          setStatus(paypalStatus, t.processing, true);
-
-          const res = await fetch("/api/capture-order", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              orderID: data.orderID,
-            }),
-          });
-
-          const result = await res.json();
-
-          if (result.status === "COMPLETED") {
-            setStatus(paypalStatus, t.success, true);
-            unlockAndRedirect(emailInput?.value.trim() || "", result);
-          } else {
-            console.error(result);
-            setStatus(paypalStatus, t.captureFailed, true);
-          }
-        },
-
-        onCancel() {
-          setStatus(paypalStatus, t.cancelled, true);
-        },
-
-        onError(err) {
-          console.error("PayPal error:", err);
-          setStatus(paypalStatus, t.failed, true);
-        },
-      }).render("#paypal-button-container");
+}).render("#paypal-button-container");
     })
     .catch((err) => {
       console.error(err);
