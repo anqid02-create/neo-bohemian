@@ -225,7 +225,7 @@ function renderPayPal(currentConfig, lang) {
 
     const order = await response.json();
 
-    return order.id;   // 关键：必须 return order.id
+    return order.id;
   },
 
   onApprove: async (data) => {
@@ -241,9 +241,13 @@ function renderPayPal(currentConfig, lang) {
 
     const capture = await response.json();
 
-    console.log("PAYMENT SUCCESS", capture);
+    console.log("Payment success:", capture);
 
-    window.location.href = "/premium.html";
+    window.location.href = "/premium-report.html";
+  },
+
+  onError: (err) => {
+    console.error("PayPal error:", err);
   }
 
 }).render("#paypal-button-container");
