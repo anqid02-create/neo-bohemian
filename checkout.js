@@ -214,81 +214,95 @@ function unlockAndRedirect(email, captureDetails) {
 
 function renderPayPal(currentConfig, lang) {
   const t = translations[lang];
-  if (!paypalButtonContainer) {
-    console.error("找不到 paypal-button-container 元素");
-    return;
-  }
+  if (!paypalButtonContainer) return;
 
-  try {
-    paypal.Buttons({
-      createOrder: async () => {
-        try {
-          const response = await fetch("/api/create-order", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            }
-          });
-          
-          if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`创建订单失败 (${response.status}): ${errorText}`);
-          }
-          
-          const order = await response.json();
-          
-          if (!order.id) {
-            throw new Error("返回的订单数据中没有 order.id");
-          }
-          
-          return order.id;
-        } catch (err) {
-          console.error("createOrder 错误:", err);
-          setStatus(paypalStatus, t.failed || "支付初始化失败", true);
-          throw err;
-        }
-      },
-
-      onApprove: async (data) => {
-        try {
-          const response = await fetch("/api/capture-order", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              orderID: data.orderID
-            })
-          });
-          
-          if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`捕获订单失败 (${response.status}): ${errorText}`);
-          }
-          
-          const capture = await response.json();
-          console.log("支付成功:", capture);
-          
-          // 可选：保存支付信息
-          sessionStorage.setItem('paymentCompleted', 'true');
-          sessionStorage.setItem('paymentDetails', JSON.stringify(capture));
-          
-          window.location.href = "/premium-report.html";
-        } catch (err) {
-          console.error("onApprove 错误:", err);
-          setStatus(paypalStatus, t.failed || "支付处理失败", true);
-        }
-      },
-
-      onError: (err) => {
-        console.error("PayPal 按钮错误:", err);
-        setStatus(paypalStatus, t.failed || "PayPal 加载失败，请刷新页面重试", true);
+  // 等待 PayPal SDK 加载完成的函数
+  function waitForPayPal() {
+    return new Promise((resolve, reject) => {
+      if (typeof paypal !== 'undefined' && paypal.Buttons) {
+        resolve();
+        return;
       }
-    }).render("#paypal-button-container");
-  } catch (err) {
-    console.error("初始化 PayPal 按钮失败:", err);
-    setStatus(paypalStatus, t.failed || "支付组件初始化失败", true);
+      
+      let attempts = 0;
+      const maxAttempts = 50;
+      const interval = setInterval(() => {
+        attempts++;
+        if (typeof paypal !== 'undefined' && paypal.Buttons) {
+          clearInterval(interval);
+          resolve();
+        } else if (attempts >= maxAttempts) {
+          clearInterval(interval);
+          reject(new Error('PayPal SDK 加载超时'));
+        }
+      }, 100);
+    });
   }
+
+  // 使用 async 函数等待 SDK
+  (async function() {
+    try {
+      await waitForPayPal();
+      
+      paypal.Buttons({
+        createOrder: async () => {
+          try {
+            const response = await fetch("/api/create-order", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              }
+            });
+            
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}`);
+            }
+            
+            const order = await response.json();
+            return order.id;
+          } catch (err) {
+            console.error("createOrder 错误:", err);
+            setStatus(paypalStatus, t.failed, true);
+            throw err;
+          }
+        },
+
+        onApprove: async (data) => {
+          try {
+            const response = await fetch("/api/capture-order", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                orderID: data.orderID
+              })
+            });
+            
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}`);
+            }
+            
+            const capture = await response.json();
+            console.log("Payment success:", capture);
+            window.location.href = "/premium-report.html";
+          } catch (err) {
+            console.error("onApprove 错误:", err);
+            setStatus(paypalStatus, t.failed, true);
+          }
+        },
+
+        onError: (err) => {
+          console.error("PayPal error:", err);
+          setStatus(paypalStatus, t.failed, true);
+        }
+      }).render("#paypal-button-container");
+      
+    } catch (err) {
+      console.error("PayPal SDK 加载失败:", err);
+      setStatus(paypalStatus, "支付组件加载失败，请刷新页面重试", true);
+    }
+  })();
 }
 function applyLanguage(lang) {
   currentLang = lang;
