@@ -1,13 +1,10 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
+  <script src="https://www.paypal.com/sdk/js?client-id=AYSyd0JhTHqkLPq6_b7cMLYBH3Luk3CbsljbGXUB_R7p5m9dDu0tddW8XXF2_tMQ367cDeOR9q6dp8p4&currency=USD"></script>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Checkout | BaziChart</title>
-    
-    <!-- PayPal SDK - 移到这里并添加 components 参数 -->
-    <script src="https://www.paypal.com/sdk/js?client-id=AYSyd0JhTHqkLPq6_b7cMLYBH3Luk3CbsljbGXUB_R7p5m9dDu0tddW8XXF2_tMQ367cDeOR9q6dp8p4&currency=USD&components=buttons"></script>
-    
     <link
       href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@300;400;600;800&display=swap"
       rel="stylesheet"
@@ -241,163 +238,6 @@
     </footer>
 
     <script src="./shared.js"></script>
-    
-    <!-- 修复后的 checkout.js 逻辑 -->
-    <script>
-      // 等待 PayPal SDK 加载的函数
-      function waitForPayPal() {
-        return new Promise((resolve, reject) => {
-          if (typeof paypal !== 'undefined' && paypal.Buttons) {
-            resolve();
-            return;
-          }
-          
-          let attempts = 0;
-          const maxAttempts = 50; // 最多等待5秒
-          const interval = setInterval(() => {
-            attempts++;
-            if (typeof paypal !== 'undefined' && paypal.Buttons) {
-              clearInterval(interval);
-              resolve();
-            } else if (attempts >= maxAttempts) {
-              clearInterval(interval);
-              reject(new Error('PayPal SDK 加载超时'));
-            }
-          }, 100);
-        });
-      }
-
-      // 获取元素
-      const paypalButtonContainer = document.getElementById('paypal-button-container');
-      const paypalStatus = document.getElementById('paypal-status');
-      const paypalConfigHelp = document.getElementById('paypal-config-help');
-      const emailInput = document.getElementById('checkout-email');
-
-      // 设置状态函数
-      function setStatus(element, message, isError = false) {
-        if (!element) return;
-        element.textContent = message;
-        element.classList.remove('hidden');
-        if (isError) {
-          element.classList.add('border-danger/25', 'bg-danger/10', 'text-danger');
-          element.classList.remove('border-secondary/25', 'bg-secondary/10', 'text-secondary');
-        } else {
-          element.classList.add('border-secondary/25', 'bg-secondary/10', 'text-secondary');
-          element.classList.remove('border-danger/25', 'bg-danger/10', 'text-danger');
-        }
-      }
-
-      // 渲染 PayPal 按钮
-      async function renderPayPalFix() {
-        if (!paypalButtonContainer) {
-          console.error('找不到 paypal-button-container');
-          return;
-        }
-        
-        try {
-          // 等待 PayPal SDK 加载完成
-          await waitForPayPal();
-          
-          console.log('PayPal SDK 加载成功，开始渲染按钮');
-          
-          paypal.Buttons({
-            createOrder: async () => {
-              try {
-                const email = emailInput ? emailInput.value : '';
-                
-                const response = await fetch("/api/create-order", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json"
-                  },
-                  body: JSON.stringify({ email: email })
-                });
-                
-                if (!response.ok) {
-                  throw new Error(`HTTP ${response.status}`);
-                }
-                
-                const order = await response.json();
-                return order.id;
-              } catch (err) {
-                console.error("createOrder 错误:", err);
-                if (paypalStatus) {
-                  setStatus(paypalStatus, "支付初始化失败，请重试", true);
-                }
-                throw err;
-              }
-            },
-
-            onApprove: async (data) => {
-              try {
-                if (paypalStatus) {
-                  setStatus(paypalStatus, "处理中...", false);
-                }
-                
-                const response = await fetch("/api/capture-order", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json"
-                  },
-                  body: JSON.stringify({
-                    orderID: data.orderID
-                  })
-                });
-                
-                if (!response.ok) {
-                  throw new Error(`HTTP ${response.status}`);
-                }
-                
-                const capture = await response.json();
-                console.log("支付成功:", capture);
-                
-                if (paypalStatus) {
-                  setStatus(paypalStatus, "支付成功！正在跳转...", false);
-                }
-                
-                sessionStorage.setItem('paymentCompleted', 'true');
-                sessionStorage.setItem('paymentDetails', JSON.stringify(capture));
-                
-                setTimeout(() => {
-                  window.location.href = "/premium-report.html";
-                }, 1500);
-              } catch (err) {
-                console.error("onApprove 错误:", err);
-                if (paypalStatus) {
-                  setStatus(paypalStatus, "支付处理失败，请重试", true);
-                }
-              }
-            },
-
-            onError: (err) => {
-              console.error("PayPal 错误:", err);
-              if (paypalStatus) {
-                setStatus(paypalStatus, "PayPal 加载失败，请刷新页面重试", true);
-              }
-            }
-          }).render("#paypal-button-container");
-          
-        } catch (err) {
-          console.error("初始化 PayPal 按钮失败:", err);
-          if (paypalStatus) {
-            setStatus(paypalStatus, "支付组件加载失败，请刷新页面重试", true);
-          }
-          if (paypalConfigHelp) {
-            paypalConfigHelp.innerHTML = '⚠️ PayPal SDK 加载失败。请检查网络连接后刷新页面。';
-            paypalConfigHelp.classList.remove('hidden');
-          }
-        }
-      }
-
-      // 页面加载完成后执行
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-          // 等待一小段时间确保 shared.js 中的函数也加载完成
-          setTimeout(renderPayPalFix, 500);
-        });
-      } else {
-        setTimeout(renderPayPalFix, 500);
-      }
-    </script>
+    <script src="./checkout.js"></script>
   </body>
 </html>
