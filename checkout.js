@@ -216,94 +216,44 @@ function renderPayPal(currentConfig, lang) {
   const t = translations[lang];
   if (!paypalButtonContainer) return;
 
-  // 等待 PayPal SDK 加载完成的函数
-  function waitForPayPal() {
-    return new Promise((resolve, reject) => {
-      if (typeof paypal !== 'undefined' && paypal.Buttons) {
-        resolve();
-        return;
-      }
-      
-      let attempts = 0;
-      const maxAttempts = 50;
-      const interval = setInterval(() => {
-        attempts++;
-        if (typeof paypal !== 'undefined' && paypal.Buttons) {
-          clearInterval(interval);
-          resolve();
-        } else if (attempts >= maxAttempts) {
-          clearInterval(interval);
-          reject(new Error('PayPal SDK 加载超时'));
-        }
-      }, 100);
+  paypal.Buttons({
+
+  createOrder: async () => {
+    const response = await fetch("/api/create-order", {
+      method: "POST"
     });
+
+    const order = await response.json();
+
+    return order.id;   // 关键：必须 return order.id
+  },
+
+  onApprove: async (data) => {
+    const response = await fetch("/api/capture-order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        orderID: data.orderID
+      })
+    });
+
+    const capture = await response.json();
+
+    console.log("PAYMENT SUCCESS", capture);
+
+    window.location.href = "/premium.html";
   }
 
-  // 使用 async 函数等待 SDK
-  (async function() {
-    try {
-      await waitForPayPal();
-      
-      paypal.Buttons({
-        createOrder: async () => {
-          try {
-            const response = await fetch("/api/create-order", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json"
-              }
-            });
-            
-            if (!response.ok) {
-              throw new Error(`HTTP ${response.status}`);
-            }
-            
-            const order = await response.json();
-            return order.id;
-          } catch (err) {
-            console.error("createOrder 错误:", err);
-            setStatus(paypalStatus, t.failed, true);
-            throw err;
-          }
-        },
-
-        onApprove: async (data) => {
-          try {
-            const response = await fetch("/api/capture-order", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({
-                orderID: data.orderID
-              })
-            });
-            
-            if (!response.ok) {
-              throw new Error(`HTTP ${response.status}`);
-            }
-            
-            const capture = await response.json();
-            console.log("Payment success:", capture);
-            window.location.href = "/premium-report.html";
-          } catch (err) {
-            console.error("onApprove 错误:", err);
-            setStatus(paypalStatus, t.failed, true);
-          }
-        },
-
-        onError: (err) => {
-          console.error("PayPal error:", err);
-          setStatus(paypalStatus, t.failed, true);
-        }
-      }).render("#paypal-button-container");
-      
-    } catch (err) {
-      console.error("PayPal SDK 加载失败:", err);
-      setStatus(paypalStatus, "支付组件加载失败，请刷新页面重试", true);
-    }
-  })();
+}).render("#paypal-button-container");
+    })
+    .catch((err) => {
+      console.error(err);
+      setStatus(paypalStatus, t.failed, true);
+    });
 }
+
 function applyLanguage(lang) {
   currentLang = lang;
   const t = translations[lang];
