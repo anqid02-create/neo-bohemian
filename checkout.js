@@ -217,47 +217,60 @@ function renderPayPal(currentConfig, lang) {
   if (!paypalButtonContainer) return;
 
   paypal.Buttons({
+    createOrder: async () => {
+      try {
+        const response = await fetch("/api/create-order", {
+          method: "POST"
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const order = await response.json();
+        return order.id;
+      } catch (err) {
+        console.error("创建订单失败:", err);
+        setStatus(paypalStatus, t.failed, true);
+        throw err; // 重新抛出错误，让PayPal显示错误信息
+      }
+    },
 
-  createOrder: async () => {
-    const response = await fetch("/api/create-order", {
-      method: "POST"
-    });
+    onApprove: async (data) => {
+      try {
+        const response = await fetch("/api/capture-order", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            orderID: data.orderID
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const capture = await response.json();
+        console.log("Payment success:", capture);
+        
+        // 可选：保存订单信息到 localStorage
+        localStorage.setItem('lastPayment', JSON.stringify(capture));
+        
+        window.location.href = "/premium-report.html";
+      } catch (err) {
+        console.error("捕获订单失败:", err);
+        setStatus(paypalStatus, t.failed, true);
+      }
+    },
 
-    const order = await response.json();
-
-    return order.id;
-  },
-
-  onApprove: async (data) => {
-    const response = await fetch("/api/capture-order", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        orderID: data.orderID
-      })
-    });
-
-    const capture = await response.json();
-
-    console.log("Payment success:", capture);
-
-    window.location.href = "/premium-report.html";
-  },
-
-  onError: (err) => {
-    console.error("PayPal error:", err);
-  }
-
-}).render("#paypal-button-container");
-    })
-    .catch((err) => {
-      console.error(err);
+    onError: (err) => {
+      console.error("PayPal error:", err);
       setStatus(paypalStatus, t.failed, true);
-    });
+    }
+  }).render("#paypal-button-container");  // ✅ 这里只有一个 ).render
 }
-
 function applyLanguage(lang) {
   currentLang = lang;
   const t = translations[lang];
