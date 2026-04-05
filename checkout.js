@@ -246,9 +246,6 @@ function renderPayPal(currentConfig, lang) {
     window.location.href = "/premium.html";
   }
 
-}).render("#paypal-button-container");
-    })
-    .catch((err) => {
       console.error(err);
       setStatus(paypalStatus, t.failed, true);
     });
