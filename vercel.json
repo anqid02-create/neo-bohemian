@@ -5,7 +5,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'unsafe-inline' https://*.paypal.com https://*.paypalobjects.com; style-src 'unsafe-inline' https://*.paypal.com; connect-src https://*.paypal.com; frame-src https://*.paypal.com; img-src https://*.paypal.com https://*.paypalobjects.com"
+          "value": "default-src 'self'; script-src 'unsafe-inline' 'unsafe-eval' https://*.paypal.com https://*.paypalobjects.com https://cdn.tailwindcss.com https://02neo-bohemian.vercel.app; style-src 'unsafe-inline' https://*.paypal.com https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://*.paypal.com; frame-src https://*.paypal.com; img-src https://*.paypal.com https://*.paypalobjects.com data:;"
         }
       ]
     }
