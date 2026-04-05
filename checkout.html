@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Checkout | BaziChart</title>
     
-    <!-- PayPal SDK - 放在 head 中，添加 components 参数确保正确加载 -->
+    <!-- PayPal SDK - 移到这里并添加 components 参数 -->
     <script src="https://www.paypal.com/sdk/js?client-id=AYSyd0JhTHqkLPq6_b7cMLYBH3Luk3CbsljbGXUB_R7p5m9dDu0tddW8XXF2_tMQ367cDeOR9q6dp8p4&currency=USD&components=buttons"></script>
     
     <link
@@ -130,7 +130,7 @@
             <div class="mb-8 flex items-start justify-between gap-4">
               <div>
                 <p class="mb-2 text-xs font-bold uppercase tracking-[0.3em] text-primary" id="checkout-what-topline">Premium Access</p>
-                <h2 class="font-headline text-3xl text-text md:text-4xl" id="checkout-what-title">What You'll Get</h2>
+                <h2 class="font-headline text-3xl text-text md:text-4xl" id="checkout-what-title">What You’ll Get</h2>
               </div>
               <div class="rounded-full border border-primary/25 bg-primary/10 p-4 text-primary">
                 <span class="material-symbols-outlined">auto_stories</span>
@@ -240,200 +240,11 @@
       </div>
     </footer>
 
-    <!-- 先加载 shared.js -->
     <script src="./shared.js"></script>
     
-    <!-- checkout.js 的内容直接写在这里，避免外部文件加载问题 -->
+    <!-- 修复后的 checkout.js 逻辑 -->
     <script>
-      // ==================== 翻译配置 ====================
-      const translations = {
-        en: {
-          // Header & title
-          checkout_eyebrow: "Premium Checkout",
-          checkout_title: "Unlock Your Full Destiny Report",
-          checkout_summary: "Receive your complete premium reading — detailed analysis, life cycles, and personal guidance.",
-          checkout_disclaimer: "For entertainment purposes only.",
-          
-          // What you get
-          checkout_what_topline: "Premium Access",
-          checkout_what_title: "What You'll Get",
-          checkout_item_1_label: "Included",
-          checkout_item_1: "Core Personality Blueprint",
-          checkout_item_2_label: "Included",
-          checkout_item_2: "Emotional World",
-          checkout_item_3_label: "Included",
-          checkout_item_3: "Talent & Natural Abilities",
-          checkout_item_4_label: "Included",
-          checkout_item_4: "Career & Professional Path",
-          checkout_ellipsis_label: "And More",
-          checkout_ellipsis_symbol: "...",
-          checkout_ellipsis_copy: "Life cycles, compatibility, final guidance, and the rest of your premium manuscript continue inside the full report.",
-          
-          // Trust section
-          checkout_trust_title: "Secure report delivery",
-          checkout_trust_copy: "Your purchase unlocks the premium page immediately and keeps your current chart context attached.",
-          checkout_trust_1_top: "Payment",
-          checkout_trust_1: "Processed with PayPal",
-          checkout_trust_2_top: "Access",
-          checkout_trust_2: "Unlocked right after approval",
-          checkout_trust_3_top: "Format",
-          checkout_trust_3: "Premium manuscript experience",
-          
-          // Payment panel
-          checkout_price_topline: "One-Time Payment",
-          checkout_price_note: "Single purchase. Immediate unlock.",
-          checkout_status: "PayPal Checkout",
-          checkout_email_label: "Email",
-          checkout_paypal_title: "Pay with PayPal",
-          checkout_paypal_subtitle: "Smart Buttons Checkout",
-          paypal_note: "Complete your payment with PayPal and we will unlock your full report immediately.",
-          checkout_note: "Secure payment powered by PayPal.",
-          
-          // Footer
-          footer_copy: "© 2026 BaziChart. Etched in the stars.",
-          
-          // Status messages
-          loading: "Loading...",
-          success: "Success! Redirecting...",
-          failed: "Payment failed. Please try again.",
-          validating: "Validating..."
-        },
-        zh: {
-          // Header & title
-          checkout_eyebrow: "尊享会员",
-          checkout_title: "解锁您的完整命盘报告",
-          checkout_summary: "获取完整版命理分析报告 — 包含详细解析、人生周期与个人指引。",
-          checkout_disclaimer: "仅供娱乐参考。",
-          
-          // What you get
-          checkout_what_topline: "尊享权限",
-          checkout_what_title: "您将获得",
-          checkout_item_1_label: "包含内容",
-          checkout_item_1: "核心性格蓝图",
-          checkout_item_2_label: "包含内容",
-          checkout_item_2: "情感世界解析",
-          checkout_item_3_label: "包含内容",
-          checkout_item_3: "天赋与潜能",
-          checkout_item_4_label: "包含内容",
-          checkout_item_4: "事业发展路径",
-          checkout_ellipsis_label: "更多精彩",
-          checkout_ellipsis_symbol: "...",
-          checkout_ellipsis_copy: "人生周期、命理契合度、最终指引以及完整的命理分析报告。",
-          
-          // Trust section
-          checkout_trust_title: "安全报告交付",
-          checkout_trust_copy: "支付成功后立即解锁完整报告，您的命盘信息将自动关联。",
-          checkout_trust_1_top: "支付方式",
-          checkout_trust_1: "PayPal 安全支付",
-          checkout_trust_2_top: "访问权限",
-          checkout_trust_2: "支付后立即解锁",
-          checkout_trust_3_top: "报告格式",
-          checkout_trust_3: "尊享版完整报告",
-          
-          // Payment panel
-          checkout_price_topline: "一次性支付",
-          checkout_price_note: "单次购买，立即解锁。",
-          checkout_status: "PayPal 支付",
-          checkout_email_label: "电子邮箱",
-          checkout_paypal_title: "PayPal 支付",
-          checkout_paypal_subtitle: "智能按钮结账",
-          paypal_note: "通过 PayPal 完成支付后，我们将立即为您解锁完整报告。",
-          checkout_note: "由 PayPal 提供安全支付支持。",
-          
-          // Footer
-          footer_copy: "© 2026 BaziChart. 星盘命理。",
-          
-          // Status messages
-          loading: "加载中...",
-          success: "支付成功！正在跳转...",
-          failed: "支付失败，请重试。",
-          validating: "验证中..."
-        }
-      };
-
-      // 当前语言
-      let currentLanguage = 'en';
-      
-      // 获取DOM元素
-      const paypalButtonContainer = document.getElementById('paypal-button-container');
-      const paypalStatus = document.getElementById('paypal-status');
-      const emailInput = document.getElementById('checkout-email');
-
-      // 设置状态消息
-      function setStatus(element, message, isError = false) {
-        if (!element) return;
-        element.textContent = message;
-        element.classList.remove('hidden');
-        if (isError) {
-          element.classList.add('border-danger/25', 'bg-danger/10', 'text-danger');
-          element.classList.remove('border-secondary/25', 'bg-secondary/10', 'text-secondary');
-        } else {
-          element.classList.add('border-secondary/25', 'bg-secondary/10', 'text-secondary');
-          element.classList.remove('border-danger/25', 'bg-danger/10', 'text-danger');
-        }
-      }
-
-      // 应用语言
-      function applyLanguage(lang) {
-        const t = translations[lang];
-        if (!t) return;
-        
-        // 更新所有带 id 的元素
-        const elements = {
-          'checkout-eyebrow': 'checkout_eyebrow',
-          'checkout-title': 'checkout_title',
-          'checkout-summary': 'checkout_summary',
-          'checkout-disclaimer': 'checkout_disclaimer',
-          'checkout-what-topline': 'checkout_what_topline',
-          'checkout-what-title': 'checkout_what_title',
-          'checkout-item-1-label': 'checkout_item_1_label',
-          'checkout-item-1': 'checkout_item_1',
-          'checkout-item-2-label': 'checkout_item_2_label',
-          'checkout-item-2': 'checkout_item_2',
-          'checkout-item-3-label': 'checkout_item_3_label',
-          'checkout-item-3': 'checkout_item_3',
-          'checkout-item-4-label': 'checkout_item_4_label',
-          'checkout-item-4': 'checkout_item_4',
-          'checkout-ellipsis-label': 'checkout_ellipsis_label',
-          'checkout-ellipsis-symbol': 'checkout_ellipsis_symbol',
-          'checkout-ellipsis-copy': 'checkout_ellipsis_copy',
-          'checkout-trust-title': 'checkout_trust_title',
-          'checkout-trust-copy': 'checkout_trust_copy',
-          'checkout-trust-1-top': 'checkout_trust_1_top',
-          'checkout-trust-1': 'checkout_trust_1',
-          'checkout-trust-2-top': 'checkout_trust_2_top',
-          'checkout-trust-2': 'checkout_trust_2',
-          'checkout-trust-3-top': 'checkout_trust_3_top',
-          'checkout-trust-3': 'checkout_trust_3',
-          'checkout-price-topline': 'checkout_price_topline',
-          'checkout-price-note': 'checkout_price_note',
-          'checkout-status': 'checkout_status',
-          'checkout-email-label': 'checkout_email_label',
-          'checkout-paypal-title': 'checkout_paypal_title',
-          'checkout-paypal-subtitle': 'checkout_paypal_subtitle',
-          'paypal-note': 'paypal_note',
-          'checkout-note': 'checkout_note',
-          'footer-copy': 'footer_copy'
-        };
-        
-        for (const [id, key] of Object.entries(elements)) {
-          const el = document.getElementById(id);
-          if (el && t[key]) {
-            el.textContent = t[key];
-          }
-        }
-        
-        // 更新语言按钮样式
-        document.querySelectorAll('[data-lang-switch]').forEach(btn => {
-          if (btn.getAttribute('data-lang-switch') === lang) {
-            btn.classList.add('is-active');
-          } else {
-            btn.classList.remove('is-active');
-          }
-        });
-      }
-
-      // 等待 PayPal SDK 加载
+      // 等待 PayPal SDK 加载的函数
       function waitForPayPal() {
         return new Promise((resolve, reject) => {
           if (typeof paypal !== 'undefined' && paypal.Buttons) {
@@ -442,7 +253,7 @@
           }
           
           let attempts = 0;
-          const maxAttempts = 50;
+          const maxAttempts = 50; // 最多等待5秒
           const interval = setInterval(() => {
             attempts++;
             if (typeof paypal !== 'undefined' && paypal.Buttons) {
@@ -456,25 +267,42 @@
         });
       }
 
+      // 获取元素
+      const paypalButtonContainer = document.getElementById('paypal-button-container');
+      const paypalStatus = document.getElementById('paypal-status');
+      const paypalConfigHelp = document.getElementById('paypal-config-help');
+      const emailInput = document.getElementById('checkout-email');
+
+      // 设置状态函数
+      function setStatus(element, message, isError = false) {
+        if (!element) return;
+        element.textContent = message;
+        element.classList.remove('hidden');
+        if (isError) {
+          element.classList.add('border-danger/25', 'bg-danger/10', 'text-danger');
+          element.classList.remove('border-secondary/25', 'bg-secondary/10', 'text-secondary');
+        } else {
+          element.classList.add('border-secondary/25', 'bg-secondary/10', 'text-secondary');
+          element.classList.remove('border-danger/25', 'bg-danger/10', 'text-danger');
+        }
+      }
+
       // 渲染 PayPal 按钮
-      async function renderPayPal() {
+      async function renderPayPalFix() {
         if (!paypalButtonContainer) {
           console.error('找不到 paypal-button-container');
           return;
         }
         
-        const t = translations[currentLanguage];
-        
         try {
-          // 等待 PayPal SDK 加载
+          // 等待 PayPal SDK 加载完成
           await waitForPayPal();
           
-          setStatus(paypalStatus, t.loading || 'Loading PayPal...', false);
+          console.log('PayPal SDK 加载成功，开始渲染按钮');
           
           paypal.Buttons({
             createOrder: async () => {
               try {
-                // 获取邮箱
                 const email = emailInput ? emailInput.value : '';
                 
                 const response = await fetch("/api/create-order", {
@@ -482,33 +310,29 @@
                   headers: {
                     "Content-Type": "application/json"
                   },
-                  body: JSON.stringify({
-                    email: email
-                  })
+                  body: JSON.stringify({ email: email })
                 });
                 
                 if (!response.ok) {
-                  const errorText = await response.text();
-                  throw new Error(`HTTP ${response.status}: ${errorText}`);
+                  throw new Error(`HTTP ${response.status}`);
                 }
                 
                 const order = await response.json();
-                
-                if (!order.id) {
-                  throw new Error('返回的订单数据中没有 order.id');
-                }
-                
                 return order.id;
               } catch (err) {
                 console.error("createOrder 错误:", err);
-                setStatus(paypalStatus, t.failed || "支付初始化失败", true);
+                if (paypalStatus) {
+                  setStatus(paypalStatus, "支付初始化失败，请重试", true);
+                }
                 throw err;
               }
             },
 
             onApprove: async (data) => {
               try {
-                setStatus(paypalStatus, t.validating || 'Processing...', false);
+                if (paypalStatus) {
+                  setStatus(paypalStatus, "处理中...", false);
+                }
                 
                 const response = await fetch("/api/capture-order", {
                   method: "POST",
@@ -521,80 +345,58 @@
                 });
                 
                 if (!response.ok) {
-                  const errorText = await response.text();
-                  throw new Error(`HTTP ${response.status}: ${errorText}`);
+                  throw new Error(`HTTP ${response.status}`);
                 }
                 
                 const capture = await response.json();
                 console.log("支付成功:", capture);
                 
-                setStatus(paypalStatus, t.success || 'Success! Redirecting...', false);
+                if (paypalStatus) {
+                  setStatus(paypalStatus, "支付成功！正在跳转...", false);
+                }
                 
-                // 保存支付信息到 sessionStorage
                 sessionStorage.setItem('paymentCompleted', 'true');
                 sessionStorage.setItem('paymentDetails', JSON.stringify(capture));
                 
-                // 跳转到成功页面
                 setTimeout(() => {
                   window.location.href = "/premium-report.html";
                 }, 1500);
               } catch (err) {
                 console.error("onApprove 错误:", err);
-                setStatus(paypalStatus, t.failed || "支付处理失败", true);
+                if (paypalStatus) {
+                  setStatus(paypalStatus, "支付处理失败，请重试", true);
+                }
               }
             },
 
             onError: (err) => {
               console.error("PayPal 错误:", err);
-              setStatus(paypalStatus, translations[currentLanguage].failed || "PayPal 加载失败，请刷新页面重试", true);
+              if (paypalStatus) {
+                setStatus(paypalStatus, "PayPal 加载失败，请刷新页面重试", true);
+              }
             }
           }).render("#paypal-button-container");
           
         } catch (err) {
           console.error("初始化 PayPal 按钮失败:", err);
-          setStatus(paypalStatus, "支付组件加载失败，请刷新页面重试", true);
-          
-          // 显示帮助信息
-          const helpDiv = document.getElementById('paypal-config-help');
-          if (helpDiv) {
-            helpDiv.innerHTML = '⚠️ PayPal SDK 加载失败。请检查网络连接后刷新页面。';
-            helpDiv.classList.remove('hidden');
+          if (paypalStatus) {
+            setStatus(paypalStatus, "支付组件加载失败，请刷新页面重试", true);
+          }
+          if (paypalConfigHelp) {
+            paypalConfigHelp.innerHTML = '⚠️ PayPal SDK 加载失败。请检查网络连接后刷新页面。';
+            paypalConfigHelp.classList.remove('hidden');
           }
         }
       }
 
-      // 初始化页面
-      function init() {
-        // 获取保存的语言设置
-        const savedLang = localStorage.getItem('bazichart_language');
-        if (savedLang && (savedLang === 'en' || savedLang === 'zh')) {
-          currentLanguage = savedLang;
-        }
-        
-        // 应用语言
-        applyLanguage(currentLanguage);
-        
-        // 设置语言切换按钮
-        document.querySelectorAll('[data-lang-switch]').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            const lang = btn.getAttribute('data-lang-switch');
-            if (lang === 'en' || lang === 'zh') {
-              currentLanguage = lang;
-              localStorage.setItem('bazichart_language', lang);
-              applyLanguage(currentLanguage);
-            }
-          });
-        });
-        
-        // 渲染 PayPal 按钮
-        renderPayPal();
-      }
-      
-      // 页面加载完成后初始化
+      // 页面加载完成后执行
       if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', function() {
+          // 等待一小段时间确保 shared.js 中的函数也加载完成
+          setTimeout(renderPayPalFix, 500);
+        });
       } else {
-        init();
+        setTimeout(renderPayPalFix, 500);
       }
     </script>
   </body>
