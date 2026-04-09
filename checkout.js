@@ -12,6 +12,7 @@ const navGenerateLink = document.getElementById("nav-generate");
 let currentLang = window.BaziChart.getLanguage();
 let sdkLoadPromise = null;
 let publicSettingsPromise = null;
+const LOCAL_PAYPAL_KEY = "bazichart_public_paypal_settings";
 
 const translations = {
   en: {
@@ -132,16 +133,27 @@ async function loadPublicSettings() {
   return publicSettingsPromise;
 }
 
+function loadLocalPaypalSettings() {
+  try {
+    const raw = window.localStorage.getItem(LOCAL_PAYPAL_KEY);
+    if (!raw) return {};
+    return JSON.parse(raw);
+  } catch (error) {
+    return {};
+  }
+}
+
 async function getCheckoutConfig() {
   const inlineConfig = window.BaziChartCheckoutConfig || {};
   const settings = await loadPublicSettings();
   const paypal = settings.paypal || {};
+  const local = loadLocalPaypalSettings();
   return {
-    enabled: paypal.enabled !== false,
-    clientId: paypal.clientId || inlineConfig.paypalClientId || "",
-    currency: (paypal.currency || inlineConfig.currency || "USD").toUpperCase(),
-    amount: String(paypal.amount || inlineConfig.amount || "9.99"),
-    intent: String(paypal.intent || inlineConfig.intent || "CAPTURE").toUpperCase(),
+    enabled: (paypal.enabled !== false) && (local.enabled !== false),
+    clientId: paypal.clientId || local.clientId || inlineConfig.paypalClientId || "",
+    currency: (paypal.currency || local.currency || inlineConfig.currency || "USD").toUpperCase(),
+    amount: String(paypal.amount || local.amount || inlineConfig.amount || "9.99"),
+    intent: String(paypal.intent || local.intent || inlineConfig.intent || "CAPTURE").toUpperCase(),
   };
 }
 

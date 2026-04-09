@@ -23,14 +23,19 @@ function sanitizeSettingsPatch(payload) {
 
 function toPublicSettings(settings) {
   const paypal = settings.paypal || {};
+  const envClientId = process.env.PAYPAL_CLIENT_ID || "";
+  const envCurrency = process.env.PAYPAL_CURRENCY || "";
+  const envAmount = process.env.PAYPAL_AMOUNT || "";
+  const envIntent = process.env.PAYPAL_INTENT || "";
+  const envMode = process.env.PAYPAL_MODE || "";
   return {
     paypal: {
-      enabled: Boolean(paypal.enabled),
-      mode: paypal.mode === "live" ? "live" : "sandbox",
-      clientId: paypal.clientId || "",
-      currency: paypal.currency || "USD",
-      amount: paypal.amount || "9.99",
-      intent: paypal.intent || "CAPTURE",
+      enabled: envClientId ? true : Boolean(paypal.enabled),
+      mode: (envMode || paypal.mode) === "live" ? "live" : "sandbox",
+      clientId: envClientId || paypal.clientId || "",
+      currency: (envCurrency || paypal.currency || "USD").toUpperCase(),
+      amount: String(envAmount || paypal.amount || "9.99"),
+      intent: String(envIntent || paypal.intent || "CAPTURE").toUpperCase(),
     },
   };
 }

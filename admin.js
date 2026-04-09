@@ -1,4 +1,5 @@
 const TOKEN_KEY = "bazichart_admin_token";
+const PUBLIC_PAYPAL_KEY = "bazichart_public_paypal_settings";
 
 const loginPanel = document.getElementById("login-panel");
 const dashboardPanel = document.getElementById("dashboard-panel");
@@ -44,6 +45,23 @@ function setToken(token) {
       return;
     }
     window.localStorage.setItem(TOKEN_KEY, token);
+  } catch (error) {
+    return;
+  }
+}
+
+function savePublicPaypalToLocal(settings) {
+  try {
+    const paypal = settings?.paypal || {};
+    const payload = {
+      enabled: paypal.enabled !== false,
+      mode: paypal.mode === "live" ? "live" : "sandbox",
+      clientId: paypal.clientId || "",
+      currency: paypal.currency || "USD",
+      amount: paypal.amount || "9.99",
+      intent: paypal.intent || "CAPTURE",
+    };
+    window.localStorage.setItem(PUBLIC_PAYPAL_KEY, JSON.stringify(payload));
   } catch (error) {
     return;
   }
@@ -171,6 +189,7 @@ async function loadSettings() {
   try {
     const data = await apiRequest("/api/admin/settings");
     fillSettings(data.settings);
+    savePublicPaypalToLocal(data.settings);
   } catch (error) {
     showMessage(settingsError, normalizeErrorMessage(error));
     if (String(error.message).toLowerCase().includes("unauthorized")) {
@@ -185,10 +204,11 @@ async function saveSettings() {
   showMessage(settingsError, "");
   try {
     const payload = buildSettingsPayload();
-    await apiRequest("/api/admin/settings", {
+    const data = await apiRequest("/api/admin/settings", {
       method: "POST",
       body: JSON.stringify(payload),
     });
+    savePublicPaypalToLocal(data.settings);
     showMessage(settingsOk, "Saved.");
   } catch (error) {
     showMessage(settingsError, normalizeErrorMessage(error));
