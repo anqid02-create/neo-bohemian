@@ -1,7 +1,7 @@
 const params = new URLSearchParams(window.location.search);
 const date = params.get("date");
 const time = params.get("time") || "12:00";
-const location = params.get("location") || "";
+const birthLocation = params.get("location") || "";
 
 const emailInput = document.getElementById("checkout-email");
 const paymentButtonMount = document.getElementById("payment-button-mount");
@@ -21,7 +21,7 @@ const translations = {
     navGenerate: "Generate Chart",
     eyebrow: "Premium Checkout",
     title: "Unlock Your Full Destiny Report",
-    summary: `You are unlocking the premium manuscript for ${location} on ${date} at ${time}.`,
+    summary: `You are unlocking the premium manuscript for ${birthLocation} on ${date} at ${time}.`,
     whatTopline: "Premium Access",
     whatTitle: "What You'll Get",
     itemLabel: "Included",
@@ -64,7 +64,7 @@ const translations = {
     navGenerate: "生成命盘",
     eyebrow: "高级支付",
     title: "解锁完整深度命盘报告",
-    summary: `您正在为 ${location}（${date} ${time}）解锁完整报告。`,
+    summary: `您正在为 ${birthLocation}（${date} ${time}）解锁完整报告。`,
     whatTopline: "高级权限",
     whatTitle: "您将获得",
     itemLabel: "包含内容",
@@ -202,7 +202,7 @@ function unlockAndRedirect(email, captureDetails) {
   const nextParams = new URLSearchParams({
     date,
     time,
-    location,
+    location: birthLocation,
     unlocked: "1",
     lang: currentLang,
   });
@@ -299,7 +299,7 @@ function applyLanguage(lang) {
   setText("nav-generate", t.navGenerate);
   if (navGenerateLink) {
     navGenerateLink.href = date
-      ? `./result.html?${new URLSearchParams({ date, time, location, lang }).toString()}`
+      ? `./result.html?${new URLSearchParams({ date, time, location: birthLocation, lang }).toString()}`
       : "./index.html#calculator";
   }
 
