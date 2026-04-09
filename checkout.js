@@ -144,16 +144,20 @@ function loadLocalPaypalSettings() {
 }
 
 async function getCheckoutConfig() {
+  const urlClientId = params.get("paypalClientId") || "";
+  const urlCurrency = params.get("currency") || "";
+  const urlAmount = params.get("amount") || "";
+  const urlIntent = params.get("intent") || "";
   const inlineConfig = window.BaziChartCheckoutConfig || {};
   const settings = await loadPublicSettings();
   const paypal = settings.paypal || {};
   const local = loadLocalPaypalSettings();
   return {
     enabled: (paypal.enabled !== false) && (local.enabled !== false),
-    clientId: paypal.clientId || local.clientId || inlineConfig.paypalClientId || "",
-    currency: (paypal.currency || local.currency || inlineConfig.currency || "USD").toUpperCase(),
-    amount: String(paypal.amount || local.amount || inlineConfig.amount || "9.99"),
-    intent: String(paypal.intent || local.intent || inlineConfig.intent || "CAPTURE").toUpperCase(),
+    clientId: urlClientId || paypal.clientId || local.clientId || inlineConfig.paypalClientId || "sb",
+    currency: (urlCurrency || paypal.currency || local.currency || inlineConfig.currency || "USD").toUpperCase(),
+    amount: String(urlAmount || paypal.amount || local.amount || inlineConfig.amount || "9.99"),
+    intent: String(urlIntent || paypal.intent || local.intent || inlineConfig.intent || "CAPTURE").toUpperCase(),
   };
 }
 
