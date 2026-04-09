@@ -1,14 +1,17 @@
 const params = new URLSearchParams(window.location.search);
 const date = params.get("date");
 const time = params.get("time") || "12:00";
-const birthLocation = params.get("location") || "";
+const location = params.get("location") || "";
 
 const emailInput = document.getElementById("checkout-email");
 const paypalButtonContainer = document.getElementById("paypal-button-container");
 const paypalStatus = document.getElementById("paypal-status");
+const paypalConfigHelp = document.getElementById("paypal-config-help");
 const navGenerateLink = document.getElementById("nav-generate");
 
 let currentLang = window.BaziChart.getLanguage();
+let sdkLoadPromise = null;
+let publicSettingsPromise = null;
 
 const translations = {
   en: {
@@ -17,7 +20,7 @@ const translations = {
     navGenerate: "Generate Chart",
     eyebrow: "Premium Checkout",
     title: "Unlock Your Full Destiny Report",
-    summary: `You are unlocking the premium manuscript for ${birthLocation} on ${date} at ${time}.`,
+    summary: `You are unlocking the premium manuscript for ${location} on ${date} at ${time}.`,
     whatTopline: "Premium Access",
     whatTitle: "What You'll Get",
     itemLabel: "Included",
@@ -44,9 +47,15 @@ const translations = {
     disclaimer: "For entertainment purposes only.",
     footerContact: "For any information, please contact: anqid02@gmail.com",
     footerCopy: "© 2026 BaziChart. Etched in the stars.",
-    failed: "Payment failed. Please try again.",
+    disabled: "PayPal is currently disabled in admin settings.",
+    missingConfig: "PayPal credentials are missing. Please set client id and secret in admin.",
     loading: "Loading PayPal...",
-    success: "Success! Redirecting..."
+    ready: "PayPal is ready. Complete payment to unlock.",
+    blocked: "Please enter a valid email before continuing.",
+    processing: "Processing your payment...",
+    success: "Success! Redirecting...",
+    failed: "Payment failed. Please try again.",
+    initFailed: "Could not initialize PayPal checkout.",
   },
   zh: {
     navCalculator: "首页",
@@ -54,37 +63,43 @@ const translations = {
     navGenerate: "生成命盘",
     eyebrow: "高级支付",
     title: "解锁完整深度命盘报告",
-    summary: `您正在为 ${birthLocation}（${date} ${time}）解锁完整报告。`,
+    summary: `您正在为 ${location}（${date} ${time}）解锁完整报告。`,
     whatTopline: "高级权限",
     whatTitle: "您将获得",
     itemLabel: "包含内容",
-    items: ["核心性格蓝图", "情感世界解析", "天赋与潜能", "事业发展路径"],
-    ellipsisLabel: "更多内容",
+    items: ["核心性格蓝图", "情感世界解析", "天赋与自然能力", "事业发展路径"],
+    ellipsisLabel: "更多",
     ellipsisSymbol: "...",
-    ellipsisCopy: "人生周期、匹配概览、最终指引等更多内容。",
+    ellipsisCopy: "包含人生周期、匹配概览、最终指引等内容。",
     trustTitle: "安全交付",
     trustCopy: "PayPal 支付成功后立即解锁高级页面。",
     trustTop1: "支付",
-    trust1: "PayPal 安全支付",
+    trust1: "由 PayPal 处理",
     trustTop2: "解锁",
     trust2: "支付后立即开放",
     trustTop3: "格式",
-    trust3: "高级命理手稿",
+    trust3: "高级手稿体验",
     priceTopline: "一次性支付",
     priceNote: "单次购买，立即解锁。",
     status: "PayPal 支付",
     emailLabel: "邮箱",
-    paypalTitle: "PayPal 支付",
+    paypalTitle: "通过 PayPal 支付",
     paypalSubtitle: "智能按钮结账",
-    paypalNote: "完成 PayPal 支付后立即解锁。",
+    paypalNote: "完成 PayPal 支付即可解锁。",
     note: "由 PayPal 提供安全支付支持。",
     disclaimer: "仅供娱乐参考。",
-    footerContact: "联系我们: anqid02@gmail.com",
+    footerContact: "任何信息可以联系邮箱：anqid02@gmail.com",
     footerCopy: "© 2026 BaziChart. 星图已启。",
+    disabled: "后台设置中暂未启用 PayPal。",
+    missingConfig: "PayPal 配置缺失，请先在后台填写 client id 与 secret。",
+    loading: "正在加载 PayPal...",
+    ready: "PayPal 已就绪，完成支付即可解锁。",
+    blocked: "请先填写有效邮箱再继续。",
+    processing: "正在处理支付...",
+    success: "支付成功，正在跳转...",
     failed: "支付失败，请重试。",
-    loading: "加载中...",
-    success: "支付成功！跳转中..."
-  }
+    initFailed: "PayPal 初始化失败。",
+  },
 };
 
 function setText(id, value) {
@@ -92,63 +107,186 @@ function setText(id, value) {
   if (node) node.textContent = value;
 }
 
-function setStatus(target, message, isError) {
-  if (!target) return;
-  target.textContent = message || "";
-  target.classList.remove("hidden");
+function setStatus(node, message) {
+  if (!node) return;
+  node.textContent = message || "";
+  node.classList.toggle("hidden", !message);
 }
 
-function getCheckoutConfig() {
+function isValidEmail(value) {
+  return Boolean(value && value.includes("@") && value.includes("."));
+}
+
+async function loadPublicSettings() {
+  if (!publicSettingsPromise) {
+    publicSettingsPromise = fetch("/api/admin/settings?public=1")
+      .then(async (res) => {
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.ok) {
+          throw new Error(data.error || "Failed to load settings");
+        }
+        return data.settings || {};
+      })
+      .catch(() => ({}));
+  }
+  return publicSettingsPromise;
+}
+
+async function getCheckoutConfig() {
   const inlineConfig = window.BaziChartCheckoutConfig || {};
+  const settings = await loadPublicSettings();
+  const paypal = settings.paypal || {};
   return {
-    clientId: inlineConfig.paypalClientId || "sb",
-    currency: inlineConfig.currency || "USD",
-    amount: inlineConfig.amount || "9.99",
-    intent: inlineConfig.intent || "capture",
+    enabled: paypal.enabled !== false,
+    clientId: paypal.clientId || inlineConfig.paypalClientId || "",
+    currency: (paypal.currency || inlineConfig.currency || "USD").toUpperCase(),
+    amount: String(paypal.amount || inlineConfig.amount || "9.99"),
+    intent: String(paypal.intent || inlineConfig.intent || "CAPTURE").toUpperCase(),
   };
 }
 
-function renderPayPal(currentConfig, lang) {
-  const t = translations[lang];
-  if (!paypalButtonContainer) return;
+function loadPayPalSdk(config) {
+  if (window.paypal) {
+    return Promise.resolve(window.paypal);
+  }
+  if (sdkLoadPromise) {
+    return sdkLoadPromise;
+  }
 
-  paypal.Buttons({
-    createOrder: function(data, actions) {
-      return actions.order.create({
-        purchase_units: [{
-          amount: {
-            value: currentConfig.amount,
-            currency_code: currentConfig.currency
+  sdkLoadPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    const sdkUrl = new URL("https://www.paypal.com/sdk/js");
+    sdkUrl.searchParams.set("client-id", config.clientId);
+    sdkUrl.searchParams.set("currency", config.currency);
+    sdkUrl.searchParams.set("intent", config.intent.toLowerCase());
+    sdkUrl.searchParams.set("components", "buttons");
+    script.src = sdkUrl.toString();
+    script.async = true;
+    script.onload = () => (window.paypal ? resolve(window.paypal) : reject(new Error("paypal-sdk-missing")));
+    script.onerror = () => reject(new Error("paypal-sdk-load-failed"));
+    document.head.appendChild(script);
+  });
+
+  return sdkLoadPromise;
+}
+
+function unlockAndRedirect(email, captureDetails) {
+  sessionStorage.setItem(
+    "bazichart_demo_purchase",
+    JSON.stringify({
+      provider: "paypal",
+      email,
+      paidAt: new Date().toISOString(),
+      reference: captureDetails.id || "",
+      payerName: captureDetails.payer?.name?.given_name || "",
+      captureDetails,
+    })
+  );
+
+  const nextParams = new URLSearchParams({
+    date,
+    time,
+    location,
+    unlocked: "1",
+    lang: currentLang,
+  });
+  window.location.href = `./premium-report.html?${nextParams.toString()}`;
+}
+
+async function renderPayPal(lang) {
+  const t = translations[lang];
+  const config = await getCheckoutConfig();
+
+  if (!paypalButtonContainer) return;
+  paypalButtonContainer.innerHTML = "";
+  setStatus(paypalStatus, "");
+  setStatus(paypalConfigHelp, "");
+
+  if (!config.enabled) {
+    setStatus(paypalConfigHelp, t.disabled);
+    return;
+  }
+  if (!config.clientId) {
+    setStatus(paypalConfigHelp, t.missingConfig);
+    return;
+  }
+
+  setStatus(paypalStatus, t.loading);
+
+  try {
+    const paypal = await loadPayPalSdk(config);
+    setStatus(paypalStatus, t.ready);
+
+    await paypal
+      .Buttons({
+        style: { layout: "vertical", color: "gold", shape: "rect", label: "paypal", height: 48 },
+        onClick(data, actions) {
+          const email = emailInput?.value.trim() || "";
+          if (!isValidEmail(email)) {
+            setStatus(paypalStatus, t.blocked);
+            return actions.reject();
           }
-        }]
-      });
-    },
-    onApprove: function(data, actions) {
-      return actions.order.capture().then(function(details) {
-        console.log("PAYMENT SUCCESS", details);
-        setStatus(paypalStatus, t.success, false);
-        sessionStorage.setItem('paymentCompleted', 'true');
-        sessionStorage.setItem('paymentDetails', JSON.stringify(details));
-        setTimeout(() => {
-          window.location.href = "/premium-report.html";
-        }, 1500);
-      });
-    },
-    onError: function(err) {
-      console.error("PayPal error:", err);
-      setStatus(paypalStatus, t.failed, true);
-    }
-  }).render("#paypal-button-container");
+          return actions.resolve();
+        },
+        createOrder: async () => {
+          const email = emailInput?.value.trim() || "";
+          const response = await fetch("/api/create-order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email,
+              amount: config.amount,
+              currency: config.currency,
+              intent: config.intent,
+            }),
+          });
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok || !data.id) {
+            throw new Error(data.error || data.details || "create-order failed");
+          }
+          return data.id;
+        },
+        onApprove: async (data) => {
+          setStatus(paypalStatus, t.processing);
+          const email = emailInput?.value.trim() || "";
+          const response = await fetch("/api/capture-order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ orderID: data.orderID, email }),
+          });
+          const capture = await response.json().catch(() => ({}));
+          if (!response.ok || !capture.ok) {
+            throw new Error(capture.error || capture.details || "capture-order failed");
+          }
+          setStatus(paypalStatus, t.success);
+          unlockAndRedirect(email, capture);
+        },
+        onCancel: () => {
+          setStatus(paypalStatus, t.failed);
+        },
+        onError: () => {
+          setStatus(paypalStatus, t.failed);
+        },
+      })
+      .render("#paypal-button-container");
+  } catch (error) {
+    setStatus(paypalStatus, t.initFailed);
+  }
 }
 
 function applyLanguage(lang) {
   currentLang = lang;
   const t = translations[lang];
-  const config = getCheckoutConfig();
 
   setText("nav-calculator", t.navCalculator);
   setText("nav-knowledge", t.navKnowledge);
   setText("nav-generate", t.navGenerate);
+  if (navGenerateLink) {
+    navGenerateLink.href = date
+      ? `./result.html?${new URLSearchParams({ date, time, location, lang }).toString()}`
+      : "./index.html#calculator";
+  }
+
   setText("checkout-eyebrow", t.eyebrow);
   setText("checkout-title", t.title);
   setText("checkout-summary", t.summary);
@@ -174,16 +312,15 @@ function applyLanguage(lang) {
   setText("footer-contact", t.footerContact);
   setText("footer-copy", t.footerCopy);
 
-  for (let i = 0; i < t.items.length; i++) {
+  for (let i = 0; i < t.items.length; i += 1) {
     setText(`checkout-item-${i + 1}-label`, t.itemLabel);
     setText(`checkout-item-${i + 1}`, t.items[i]);
   }
-
   setText("checkout-ellipsis-label", t.ellipsisLabel);
   setText("checkout-ellipsis-symbol", t.ellipsisSymbol);
   setText("checkout-ellipsis-copy", t.ellipsisCopy);
 
-  renderPayPal(config, lang);
+  renderPayPal(lang);
 }
 
 if (!date) {
