@@ -80,7 +80,7 @@
         border-bottom: 1px solid rgba(173, 203, 214, 0.45);
       }
 
-      #paypal-button-container {
+      #payment-button-mount {
         min-height: 48px;
       }
     </style>
@@ -205,19 +205,19 @@
               <div class="mb-4 flex items-center gap-3">
                 <span class="material-symbols-outlined text-primary">account_balance_wallet</span>
                 <div>
-                  <p class="text-sm font-semibold text-text" id="checkout-paypal-title">Pay with PayPal</p>
-                  <p class="text-xs uppercase tracking-[0.22em] text-secondary/60" id="checkout-paypal-subtitle">Smart Buttons Checkout</p>
+                  <p class="text-sm font-semibold text-text" id="checkout-payment-title">Pay with PayPal</p>
+                  <p class="text-xs uppercase tracking-[0.22em] text-secondary/60" id="checkout-payment-subtitle">Smart Buttons Checkout</p>
                 </div>
               </div>
 
-              <div class="mb-4 rounded-xl border border-primary/10 bg-primary/6 px-4 py-3 text-sm leading-relaxed text-muted" id="paypal-note">
+              <div class="mb-4 rounded-xl border border-primary/10 bg-primary/6 px-4 py-3 text-sm leading-relaxed text-muted" id="payment-note">
                 Complete your payment with PayPal and we will unlock your full report immediately.
               </div>
 
-              <div class="mb-4 hidden rounded-xl border border-danger/25 bg-danger/10 px-4 py-3 text-sm leading-relaxed text-danger" id="paypal-config-help"></div>
-              <div class="mb-4 hidden rounded-xl border border-secondary/25 bg-secondary/10 px-4 py-3 text-sm leading-relaxed text-secondary" id="paypal-status"></div>
+              <div class="mb-4 hidden rounded-xl border border-danger/25 bg-danger/10 px-4 py-3 text-sm leading-relaxed text-danger" id="payment-config-help"></div>
+              <div class="mb-4 hidden rounded-xl border border-secondary/25 bg-secondary/10 px-4 py-3 text-sm leading-relaxed text-secondary" id="payment-status"></div>
 
-              <div id="paypal-button-container"></div>
+              <div id="payment-button-mount"></div>
             </div>
 
             <p class="text-xs uppercase tracking-[0.2em] text-secondary/55" id="checkout-note">

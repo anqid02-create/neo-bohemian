@@ -4,9 +4,9 @@ const time = params.get("time") || "12:00";
 const location = params.get("location") || "";
 
 const emailInput = document.getElementById("checkout-email");
-const paypalButtonContainer = document.getElementById("paypal-button-container");
-const paypalStatus = document.getElementById("paypal-status");
-const paypalConfigHelp = document.getElementById("paypal-config-help");
+const paymentButtonMount = document.getElementById("payment-button-mount");
+const paymentStatus = document.getElementById("payment-status");
+const paymentConfigHelp = document.getElementById("payment-config-help");
 const navGenerateLink = document.getElementById("nav-generate");
 
 let currentLang = window.BaziChart.getLanguage();
@@ -213,25 +213,25 @@ async function renderPayPal(lang) {
   const t = translations[lang];
   const config = await getCheckoutConfig();
 
-  if (!paypalButtonContainer) return;
-  paypalButtonContainer.innerHTML = "";
-  setStatus(paypalStatus, "");
-  setStatus(paypalConfigHelp, "");
+  if (!paymentButtonMount) return;
+  paymentButtonMount.innerHTML = "";
+  setStatus(paymentStatus, "");
+  setStatus(paymentConfigHelp, "");
 
   if (!config.enabled) {
-    setStatus(paypalConfigHelp, t.disabled);
+    setStatus(paymentConfigHelp, t.disabled);
     return;
   }
   if (!config.clientId) {
-    setStatus(paypalConfigHelp, t.missingConfig);
+    setStatus(paymentConfigHelp, t.missingConfig);
     return;
   }
 
-  setStatus(paypalStatus, t.loading);
+  setStatus(paymentStatus, t.loading);
 
   try {
     const paypal = await loadPayPalSdk(config);
-    setStatus(paypalStatus, t.ready);
+    setStatus(paymentStatus, t.ready);
 
     await paypal
       .Buttons({
@@ -239,7 +239,7 @@ async function renderPayPal(lang) {
         onClick(data, actions) {
           const email = emailInput?.value.trim() || "";
           if (!isValidEmail(email)) {
-            setStatus(paypalStatus, t.blocked);
+            setStatus(paymentStatus, t.blocked);
             return actions.reject();
           }
           return actions.resolve();
@@ -263,7 +263,7 @@ async function renderPayPal(lang) {
           return data.id;
         },
         onApprove: async (data) => {
-          setStatus(paypalStatus, t.processing);
+          setStatus(paymentStatus, t.processing);
           const email = emailInput?.value.trim() || "";
           const response = await fetch("/api/capture-order", {
             method: "POST",
@@ -274,19 +274,19 @@ async function renderPayPal(lang) {
           if (!response.ok || !capture.ok) {
             throw new Error(capture.error || capture.details || "capture-order failed");
           }
-          setStatus(paypalStatus, t.success);
+          setStatus(paymentStatus, t.success);
           unlockAndRedirect(email, capture);
         },
         onCancel: () => {
-          setStatus(paypalStatus, t.failed);
+          setStatus(paymentStatus, t.failed);
         },
         onError: () => {
-          setStatus(paypalStatus, t.failed);
+          setStatus(paymentStatus, t.failed);
         },
       })
-      .render("#paypal-button-container");
+      .render("#payment-button-mount");
   } catch (error) {
-    setStatus(paypalStatus, t.initFailed);
+    setStatus(paymentStatus, `${t.initFailed}${error?.message ? ` (${error.message})` : ""}`);
   }
 }
 
@@ -320,9 +320,9 @@ function applyLanguage(lang) {
   setText("checkout-price-note", t.priceNote);
   setText("checkout-status", t.status);
   setText("checkout-email-label", t.emailLabel);
-  setText("checkout-paypal-title", t.paypalTitle);
-  setText("checkout-paypal-subtitle", t.paypalSubtitle);
-  setText("paypal-note", t.paypalNote);
+  setText("checkout-payment-title", t.paypalTitle);
+  setText("checkout-payment-subtitle", t.paypalSubtitle);
+  setText("payment-note", t.paypalNote);
   setText("checkout-note", t.note);
   setText("checkout-disclaimer", t.disclaimer);
   setText("footer-contact", t.footerContact);
