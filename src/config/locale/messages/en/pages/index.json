@@ -1,0 +1,166 @@
+{
+  "page": {
+    "show_sections": ["hero", "introduce", "benefits", "features", "faq", "cta"],
+    "sections": {
+      "hero": {
+        "id": "hero",
+        "title": "A cinematic BaZi and astrology experience for the modern seeker",
+        "highlight_text": "modern seeker",
+        "description": "Modern Mystic turns birth data into a multi-layered reading journey: test entry, result page, checkout flow, and premium destiny report, all wrapped in a more intentional visual language.",
+        "announcement": {
+          "badge": "Migration",
+          "title": "ShipAny-powered version now in progress",
+          "url": "/legacy/index.html#calculator"
+        },
+        "tip": "Legacy chart flow remains available while the native ShipAny experience is being rebuilt.",
+        "buttons": [
+          {
+            "title": "Generate Chart",
+            "icon": "Stars",
+            "url": "/legacy/index.html#calculator",
+            "target": "_self",
+            "variant": "default"
+          },
+          {
+            "title": "Open Knowledge",
+            "icon": "BookOpenText",
+            "url": "/legacy/knowledge.html",
+            "target": "_self",
+            "variant": "outline"
+          }
+        ],
+        "show_avatars": false,
+        "show_award": false,
+        "background_image": {
+          "src": "/legacy/bg-ink.svg",
+          "alt": "Mystic ink background"
+        }
+      },
+      "introduce": {
+        "block": "features-list",
+        "id": "introduce",
+        "title": "What Modern Mystic is rebuilding inside ShipAny",
+        "label": "Core Experience",
+        "description": "This project is no longer just a static landing site. It is being rebuilt as a real ShipAny application so the built-in admin, payment settings, and content controls can manage the website from one place.",
+        "items": [
+          {
+            "title": "Chart Entry Flow",
+            "description": "Users can enter date, time, and location, then move straight into the result reading flow.",
+            "icon": "CalendarRange"
+          },
+          {
+            "title": "Result and Premium Narrative",
+            "description": "The result page and premium report carry the dark celestial editorial style you already designed.",
+            "icon": "ScrollText"
+          },
+          {
+            "title": "Knowledge Hub",
+            "description": "Educational BaZi and astrology content remains accessible as a first-class part of the site.",
+            "icon": "LibraryBig"
+          },
+          {
+            "title": "Admin-Controlled Settings",
+            "description": "Payment providers, app settings, and configurable modules now belong to ShipAny's native admin system.",
+            "icon": "ShieldCheck"
+          }
+        ],
+        "className": "bg-muted"
+      },
+      "benefits": {
+        "block": "features-accordion",
+        "id": "benefits",
+        "title": "Why this migration matters",
+        "label": "Platform Shift",
+        "description": "The goal is not just to copy pages into a new template. The goal is to move Modern Mystic onto a framework that already understands admin permissions, payments, configurable settings, and structured growth.",
+        "items": [
+          {
+            "title": "Native Admin Backend",
+            "description": "Instead of maintaining a custom admin panel, Modern Mystic can use ShipAny's own admin settings, payment pages, and RBAC system.",
+            "icon": "LayoutDashboard"
+          },
+          {
+            "title": "Safer Payment Foundation",
+            "description": "PayPal and other providers are already modeled in ShipAny's settings and payment service layer.",
+            "icon": "WalletCards"
+          },
+          {
+            "title": "Expandable Product Structure",
+            "description": "The site can grow from a chart calculator into a full SaaS-style content and reading platform without rewriting the foundation again.",
+            "icon": "Waypoints"
+          }
+        ]
+      },
+      "features": {
+        "id": "features",
+        "title": "Migration priorities",
+        "description": "The first ShipAny version focuses on preserving the existing user journey while moving control into a more durable system.",
+        "items": [
+          {
+            "title": "Keep the legacy chart flow alive",
+            "description": "Existing result, premium report, and chart-entry pages stay available during migration.",
+            "icon": "History"
+          },
+          {
+            "title": "Move brand and navigation first",
+            "description": "Header, footer, homepage messaging, and overall identity are aligned before deeper page rewrites.",
+            "icon": "PanelsTopLeft"
+          },
+          {
+            "title": "Use ShipAny settings for payments",
+            "description": "PayPal configuration is read from ShipAny's settings layer instead of a custom JSON admin.",
+            "icon": "CreditCard"
+          },
+          {
+            "title": "Prepare for native page rewrites",
+            "description": "Legacy pages can gradually become real Next routes after the platform baseline is stable.",
+            "icon": "Replace"
+          }
+        ]
+      },
+      "faq": {
+        "id": "faq",
+        "title": "Migration FAQ",
+        "description": "A few practical answers about what is happening in this first phase.",
+        "items": [
+          {
+            "title": "Will the old pages disappear immediately?",
+            "description": "No. The existing chart pages remain available during migration so the experience does not break while the ShipAny-native version is being rebuilt."
+          },
+          {
+            "title": "Will the ShipAny admin replace the custom admin?",
+            "description": "Yes. The plan is to rely on ShipAny's own admin settings and permission system rather than keeping a separate custom dashboard."
+          },
+          {
+            "title": "Is PayPal still part of the flow?",
+            "description": "Yes. The migration keeps PayPal in scope, but its configuration is meant to be controlled through ShipAny settings."
+          },
+          {
+            "title": "Why not rebuild every page at once?",
+            "description": "Because the safest migration path is to establish the platform foundation first, then move each functional page one by one without breaking the live reading flow."
+          }
+        ]
+      },
+      "cta": {
+        "id": "cta",
+        "title": "Enter the live chart flow",
+        "description": "Use the current chart entry while the ShipAny-native Modern Mystic experience continues to take shape behind the scenes.",
+        "buttons": [
+          {
+            "title": "Open Test Entry",
+            "icon": "ArrowRight",
+            "url": "/legacy/index.html#calculator",
+            "target": "_self",
+            "variant": "default"
+          },
+          {
+            "title": "Read Knowledge Hub",
+            "icon": "BookOpenText",
+            "url": "/legacy/knowledge.html",
+            "target": "_self",
+            "variant": "outline"
+          }
+        ]
+      }
+    }
+  }
+}

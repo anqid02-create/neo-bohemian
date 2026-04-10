@@ -1,0 +1,142 @@
+{
+  "header": {
+    "id": "header",
+    "brand": {
+      "title": "Modern Mystic",
+      "logo": {
+        "src": "/logo.png",
+        "alt": "Modern Mystic",
+        "width": 100,
+        "height": 100
+      },
+      "url": "/"
+    },
+    "nav": {
+      "items": [
+        {
+          "title": "Home",
+          "url": "/",
+          "icon": "Sparkles"
+        },
+        {
+          "title": "Knowledge",
+          "url": "/legacy/knowledge.html",
+          "icon": "BookOpenText"
+        },
+        {
+          "title": "Generate Chart",
+          "url": "/legacy/index.html#calculator",
+          "icon": "Stars"
+        }
+      ]
+    },
+    "buttons": [],
+    "user_nav": {
+      "show_name": true,
+      "show_credits": true,
+      "show_sign_out": true,
+      "items": [
+        {
+          "title": "Billing",
+          "url": "/settings/billing",
+          "icon": "CreditCard"
+        },
+        {
+          "title": "Payments",
+          "url": "/settings/payments",
+          "icon": "Receipt"
+        }
+      ]
+    },
+    "show_sign": true,
+    "show_theme": false,
+    "show_locale": true,
+    "topbanner": {
+      "text": "Modern Mystic is now being migrated into a full ShipAny project. The legacy chart flow remains available while the native version is being rebuilt."
+    }
+  },
+  "footer": {
+    "id": "footer",
+    "brand": {
+      "title": "Modern Mystic",
+      "description": "A hybrid reading experience that brings together BaZi structure, zodiac archetypes, and premium chart storytelling.",
+      "logo": {
+        "src": "/logo.png",
+        "alt": "Modern Mystic",
+        "width": 1024,
+        "height": 1024
+      },
+      "url": "/"
+    },
+    "nav": {
+      "items": [
+        {
+          "title": "Explore",
+          "children": [
+            {
+              "title": "Home",
+              "url": "/",
+              "target": "_self"
+            },
+            {
+              "title": "Knowledge",
+              "url": "/legacy/knowledge.html",
+              "target": "_self"
+            },
+            {
+              "title": "Generate Chart",
+              "url": "/legacy/index.html#calculator",
+              "target": "_self"
+            }
+          ]
+        },
+        {
+          "title": "Reading Flow",
+          "children": [
+            {
+              "title": "Test Entry",
+              "url": "/legacy/index.html#calculator",
+              "target": "_self"
+            },
+            {
+              "title": "Result Page",
+              "url": "/legacy/result.html?date=2002-10-10&time=12%3A00&location=Macau",
+              "target": "_self"
+            },
+            {
+              "title": "Premium Report",
+              "url": "/legacy/premium-report.html?preview=1",
+              "target": "_self"
+            }
+          ]
+        },
+        {
+          "title": "Support",
+          "children": [
+            {
+              "title": "Contact Email",
+              "url": "mailto:anqid02@gmail.com",
+              "target": "_self"
+            }
+          ]
+        }
+      ]
+    },
+    "social": {
+      "items": [
+        {
+          "title": "Email",
+          "icon": "Mail",
+          "url": "mailto:anqid02@gmail.com",
+          "target": "_self"
+        }
+      ]
+    },
+    "agreement": {
+      "items": []
+    },
+    "show_theme": false,
+    "show_locale": true,
+    "copyright": "For any information, please contact: anqid02@gmail.com"
+  }
+}
