@@ -16,7 +16,11 @@ export const envConfigs: ConfigMap = {
   theme: process.env.NEXT_PUBLIC_THEME ?? 'default',
   appearance: process.env.NEXT_PUBLIC_APPEARANCE ?? 'system',
   locale: process.env.NEXT_PUBLIC_DEFAULT_LOCALE ?? 'en',
-  database_url: process.env.DATABASE_URL ?? '',
+  database_url:
+    process.env.DATABASE_URL ??
+    process.env.POSTGRES_URL ??
+    process.env.DATABASE_URL_UNPOOLED ??
+    '',
   database_auth_token: process.env.DATABASE_AUTH_TOKEN ?? '',
   database_provider: process.env.DATABASE_PROVIDER ?? 'postgresql',
   db_schema_file: process.env.DB_SCHEMA_FILE ?? './src/config/db/schema.ts',
