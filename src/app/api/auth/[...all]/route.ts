@@ -1,3 +1,4 @@
+import { NextResponse } from 'next/server';
 import { toNextJsHandler } from 'better-auth/next-js';
 
 import { getAuth } from '@/core/auth';
@@ -22,7 +23,7 @@ function maybeRateLimitGetSession(request: Request): Response | null {
   });
 }
 
-export async function POST(request: Request) {
+async function handleAuthRequest(method: 'GET' | 'POST', request: Request) {
   const limited = maybeRateLimitGetSession(request);
   if (limited) {
     return limited;
@@ -30,16 +31,66 @@ export async function POST(request: Request) {
 
   const auth = await getAuth();
   const handler = toNextJsHandler(auth.handler);
-  return handler.POST(request);
+  const response =
+    method === 'POST' ? await handler.POST(request) : await handler.GET(request);
+
+  if (response.status >= 400) {
+    const url = new URL(request.url);
+    let body = '';
+
+    try {
+      body = await response.clone().text();
+    } catch {
+      body = '<unreadable>';
+    }
+
+    console.error('[auth-route]', {
+      method,
+      pathname: url.pathname,
+      status: response.status,
+      origin: request.headers.get('origin') || '',
+      referer: request.headers.get('referer') || '',
+      host: request.headers.get('host') || '',
+      vercelUrl: process.env.VERCEL_URL || '',
+      productionUrl: process.env.VERCEL_PROJECT_PRODUCTION_URL || '',
+      authUrl: process.env.AUTH_URL || '',
+      appUrl: process.env.NEXT_PUBLIC_APP_URL || '',
+      body,
+    });
+
+    if (
+      response.status === 401 &&
+      method === 'POST' &&
+      url.pathname.endsWith('/api/auth/sign-up/email')
+    ) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'Unauthorized',
+          debug: {
+            pathname: url.pathname,
+            origin: request.headers.get('origin') || '',
+            referer: request.headers.get('referer') || '',
+            host: request.headers.get('host') || '',
+            vercelUrl: process.env.VERCEL_URL || '',
+            productionUrl: process.env.VERCEL_PROJECT_PRODUCTION_URL || '',
+            authUrl: process.env.AUTH_URL || '',
+            appUrl: process.env.NEXT_PUBLIC_APP_URL || '',
+            responseBody: body,
+          },
+        },
+        { status: 401 }
+      );
+    }
+  }
+
+  return response;
+}
+
+export async function POST(request: Request) {
+  return handleAuthRequest('POST', request);
 }
 
 export async function GET(request: Request) {
-  const limited = maybeRateLimitGetSession(request);
-  if (limited) {
-    return limited;
-  }
-
-  const auth = await getAuth();
-  const handler = toNextJsHandler(auth.handler);
-  return handler.GET(request);
+  return handleAuthRequest('GET', request);
 }
