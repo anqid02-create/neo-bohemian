@@ -24,13 +24,61 @@ import { grantRoleForNewUser } from '@/shared/services/rbac';
 const recentVerificationEmailSentAt = new Map<string, number>();
 const VERIFICATION_EMAIL_MIN_INTERVAL_MS = 60_000;
 
+function safeHost(input?: string) {
+  if (!input) return '';
+  try {
+    return new URL(input).host;
+  } catch {
+    return input
+      .replace(/^https?:\/\//, '')
+      .replace(/\/.*$/, '')
+      .trim();
+  }
+}
+
+function unique(values: Array<string | undefined | null>) {
+  return Array.from(
+    new Set(values.map((value) => String(value || '').trim()).filter(Boolean))
+  );
+}
+
+function getAllowedHosts() {
+  return unique([
+    safeHost(envConfigs.app_url),
+    safeHost(envConfigs.auth_url),
+    process.env.VERCEL_URL,
+    process.env.VERCEL_PROJECT_PRODUCTION_URL,
+    'localhost:3000',
+    '*.vercel.app',
+  ]);
+}
+
+function getTrustedOrigins() {
+  return unique([
+    envConfigs.app_url,
+    envConfigs.auth_url,
+    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '',
+    process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : '',
+    'http://localhost:3000',
+    'https://*.vercel.app',
+  ]);
+}
+
 // Static auth options - NO database connection
 // This ensures zero database calls during build time
 const authOptions = {
   appName: envConfigs.app_name,
-  baseURL: envConfigs.auth_url,
+  baseURL:
+    envConfigs.auth_url ||
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : ''),
   secret: envConfigs.auth_secret,
-  trustedOrigins: envConfigs.app_url ? [envConfigs.app_url] : [],
+  trustedOrigins: getTrustedOrigins(),
   user: {
     // Allow persisting custom columns on user table.
     // Without this, better-auth may ignore extra properties during create/update.
