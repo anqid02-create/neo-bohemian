@@ -12,6 +12,7 @@ const navGenerateLink = document.getElementById("nav-generate");
 let currentLang = window.BaziChart.getLanguage();
 let sdkLoadPromise = null;
 let publicSettingsPromise = null;
+let lastPayPalError = "";
 const LOCAL_PAYPAL_KEY = "bazichart_public_paypal_settings";
 
 const translations = {
@@ -50,6 +51,8 @@ const translations = {
     footerCopy: "© 2026 BaziChart. Etched in the stars.",
     disabled: "PayPal is currently disabled in admin settings.",
     missingConfig: "PayPal credentials are missing. Please set client id and secret in admin.",
+    serverConfigMissing: "PayPal server credentials are incomplete. Add a matching Client ID and Secret before accepting payments.",
+    fallbackMode: "Using direct PayPal checkout because the server payment config is incomplete.",
     loading: "Loading PayPal...",
     ready: "PayPal is ready. Complete payment to unlock.",
     blocked: "Please enter a valid email before continuing.",
@@ -93,6 +96,8 @@ const translations = {
     footerCopy: "© 2026 BaziChart. 星图已启。",
     disabled: "后台设置中暂未启用 PayPal。",
     missingConfig: "PayPal 配置缺失，请先在后台填写 client id 与 secret。",
+    serverConfigMissing: "PayPal 服务端凭据不完整。请先配置成对的 Client ID 和 Secret，再开启支付。",
+    fallbackMode: "服务端支付配置不完整，正在直接使用 PayPal 官方结账流程。",
     loading: "正在加载 PayPal...",
     ready: "PayPal 已就绪，完成支付即可解锁。",
     blocked: "请先填写有效邮箱再继续。",
@@ -112,6 +117,26 @@ function setStatus(node, message) {
   if (!node) return;
   node.textContent = message || "";
   node.classList.toggle("hidden", !message);
+}
+
+function formatPayPalErrorMessage(lang, errorLike) {
+  const t = translations[lang] || translations.en;
+  const raw = typeof errorLike === "string" ? errorLike : errorLike?.message || "";
+  if (!raw) return t.failed;
+  if (/invalid_client/i.test(raw) || /client authentication failed/i.test(raw)) {
+    return `${t.failed} PayPal rejected the server credentials. Check that Client ID, Secret, and mode all match.`;
+  }
+  if (/missing paypal credentials/i.test(raw)) {
+    return t.serverConfigMissing;
+  }
+  return `${t.failed} ${raw}`;
+}
+
+function canUseClientSideFallback(config, errorLike) {
+  if (!config?.clientId) return false;
+  if (!config?.configured) return true;
+  const raw = typeof errorLike === "string" ? errorLike : errorLike?.message || "";
+  return /invalid_client|client authentication failed|missing paypal credentials|incomplete paypal/i.test(raw);
 }
 
 function isValidEmail(value) {
@@ -151,10 +176,13 @@ async function getCheckoutConfig() {
   const inlineConfig = window.BaziChartCheckoutConfig || {};
   const settings = await loadPublicSettings();
   const paypal = settings.paypal || {};
-  const local = loadLocalPaypalSettings();
+  const hasPublicConfig = Object.keys(paypal).length > 0;
+  const local = hasPublicConfig ? {} : loadLocalPaypalSettings();
   return {
     enabled: (paypal.enabled !== false) && (local.enabled !== false),
-    clientId: urlClientId || paypal.clientId || local.clientId || inlineConfig.paypalClientId || "sb",
+    configError: paypal.configError || "",
+    configured: paypal.configured !== false,
+    clientId: urlClientId || paypal.clientId || local.clientId || inlineConfig.paypalClientId || "",
     currency: (urlCurrency || paypal.currency || local.currency || inlineConfig.currency || "USD").toUpperCase(),
     amount: String(urlAmount || paypal.amount || local.amount || inlineConfig.amount || "9.99"),
     intent: String(urlIntent || paypal.intent || local.intent || inlineConfig.intent || "CAPTURE").toUpperCase(),
@@ -215,6 +243,7 @@ async function renderPayPal(lang) {
 
   if (!paymentButtonMount) return;
   paymentButtonMount.innerHTML = "";
+  lastPayPalError = "";
   setStatus(paymentStatus, "");
   setStatus(paymentConfigHelp, "");
 
@@ -226,12 +255,16 @@ async function renderPayPal(lang) {
     setStatus(paymentConfigHelp, t.missingConfig);
     return;
   }
+  if (!config.configured) {
+    setStatus(paymentConfigHelp, config.configError || t.serverConfigMissing);
+  }
 
   setStatus(paymentStatus, t.loading);
 
   try {
     const paypal = await loadPayPalSdk(config);
     setStatus(paymentStatus, t.ready);
+    let orderFlow = canUseClientSideFallback(config) ? "client" : "server";
 
     await paypal
       .Buttons({
@@ -244,44 +277,93 @@ async function renderPayPal(lang) {
           }
           return actions.resolve();
         },
-        createOrder: async () => {
-          const email = emailInput?.value.trim() || "";
-          const response = await fetch("/api/create-order", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              email,
-              amount: config.amount,
-              currency: config.currency,
+        createOrder: async (data, actions) => {
+          const createClientOrder = () =>
+            actions.order.create({
               intent: config.intent,
-            }),
-          });
-          const data = await response.json().catch(() => ({}));
-          if (!response.ok || !data.id) {
-            throw new Error(data.error || data.details || "create-order failed");
+              purchase_units: [
+                {
+                  amount: {
+                    currency_code: config.currency,
+                    value: config.amount,
+                  },
+                },
+              ],
+            });
+
+          if (orderFlow === "client") {
+            setStatus(paymentStatus, t.fallbackMode);
+            return createClientOrder();
           }
-          return data.id;
+          try {
+            const email = emailInput?.value.trim() || "";
+            const response = await fetch("/api/create-order", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                email,
+                amount: config.amount,
+                currency: config.currency,
+                intent: config.intent,
+              }),
+            });
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok || !data.id) {
+              throw new Error(data.details || data.error || "create-order failed");
+            }
+            orderFlow = "server";
+            return data.id;
+          } catch (error) {
+            if (canUseClientSideFallback(config, error)) {
+              orderFlow = "client";
+              setStatus(paymentStatus, t.fallbackMode);
+              return createClientOrder();
+            }
+            lastPayPalError = formatPayPalErrorMessage(lang, error);
+            setStatus(paymentStatus, lastPayPalError);
+            throw error;
+          }
         },
-        onApprove: async (data) => {
-          setStatus(paymentStatus, t.processing);
-          const email = emailInput?.value.trim() || "";
-          const response = await fetch("/api/capture-order", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ orderID: data.orderID, email }),
-          });
-          const capture = await response.json().catch(() => ({}));
-          if (!response.ok || !capture.ok) {
-            throw new Error(capture.error || capture.details || "capture-order failed");
+        onApprove: async (data, actions) => {
+          try {
+            setStatus(paymentStatus, t.processing);
+            const email = emailInput?.value.trim() || "";
+            if (orderFlow === "client") {
+              const capture = await actions.order.capture();
+              setStatus(paymentStatus, t.success);
+              unlockAndRedirect(email, capture);
+              return;
+            }
+            const response = await fetch("/api/capture-order", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ orderID: data.orderID, email }),
+            });
+            const capture = await response.json().catch(() => ({}));
+            if (!response.ok || !capture.ok) {
+              throw new Error(capture.details || capture.error || "capture-order failed");
+            }
+            setStatus(paymentStatus, t.success);
+            unlockAndRedirect(email, capture);
+          } catch (error) {
+            if (canUseClientSideFallback(config, error) && actions?.order?.capture) {
+              const email = emailInput?.value.trim() || "";
+              const capture = await actions.order.capture();
+              setStatus(paymentStatus, t.success);
+              unlockAndRedirect(email, capture);
+              return;
+            }
+            lastPayPalError = formatPayPalErrorMessage(lang, error);
+            setStatus(paymentStatus, lastPayPalError);
+            throw error;
           }
-          setStatus(paymentStatus, t.success);
-          unlockAndRedirect(email, capture);
         },
         onCancel: () => {
           setStatus(paymentStatus, t.failed);
         },
-        onError: () => {
-          setStatus(paymentStatus, t.failed);
+        onError: (error) => {
+          const message = lastPayPalError || formatPayPalErrorMessage(lang, error);
+          setStatus(paymentStatus, message);
         },
       })
       .render("#payment-button-mount");

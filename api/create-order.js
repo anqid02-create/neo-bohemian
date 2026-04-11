@@ -1,5 +1,6 @@
 const { parseBody, sendMethodNotAllowed } = require("./_lib/http");
 const { getSettings, getOrders, saveOrders } = require("./_lib/storage");
+const { resolvePaypalConfig } = require("./_lib/paypal-config");
 
 async function getAccessToken(baseUrl, clientId, clientSecret) {
   const auth = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
@@ -25,18 +26,18 @@ module.exports = async (req, res) => {
 
   try {
     const settings = await getSettings();
-    const paypal = settings.paypal || {};
+    const paypal = resolvePaypalConfig(settings);
     if (!paypal.enabled) {
       return res.status(400).json({ ok: false, error: "PayPal disabled in admin settings" });
     }
 
-    const clientId = process.env.PAYPAL_CLIENT_ID || paypal.clientId;
-    const clientSecret = process.env.PAYPAL_SECRET || process.env.PAYPAL_CLIENT_SECRET || paypal.clientSecret;
-    if (!clientId || !clientSecret) {
-      return res.status(500).json({ ok: false, error: "Missing PayPal credentials" });
+    if (!paypal.configured) {
+      return res.status(500).json({ ok: false, error: paypal.configError || "Missing PayPal credentials" });
     }
 
-    const mode = paypal.mode === "live" ? "live" : "sandbox";
+    const clientId = paypal.clientId;
+    const clientSecret = paypal.clientSecret;
+    const mode = paypal.mode;
     const baseUrl = mode === "live" ? "https://api-m.paypal.com" : "https://api-m.sandbox.paypal.com";
     const body = parseBody(req);
     const amount = String(body.amount || paypal.amount || "9.99");
@@ -86,10 +87,14 @@ module.exports = async (req, res) => {
 
     return res.status(200).json({ ok: true, ...orderData });
   } catch (error) {
+    const details = error.message;
     return res.status(500).json({
       ok: false,
       error: "Create order failed",
-      details: error.message,
+      details,
+      hint: /invalid_client/i.test(details)
+        ? "Check that PayPal Client ID, Secret, and mode all belong to the same sandbox/live app."
+        : undefined,
     });
   }
 };

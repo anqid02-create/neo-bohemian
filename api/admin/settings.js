@@ -1,6 +1,7 @@
 const { parseBody, sendMethodNotAllowed } = require("../_lib/http");
 const { requireAdmin } = require("../_lib/admin-auth");
 const { getSettings, saveSettings } = require("../_lib/storage");
+const { resolvePaypalConfig } = require("../_lib/paypal-config");
 
 function sanitizeSettingsPatch(payload) {
   const patch = {};
@@ -22,20 +23,18 @@ function sanitizeSettingsPatch(payload) {
 }
 
 function toPublicSettings(settings) {
-  const paypal = settings.paypal || {};
-  const envClientId = process.env.PAYPAL_CLIENT_ID || "";
-  const envCurrency = process.env.PAYPAL_CURRENCY || "";
-  const envAmount = process.env.PAYPAL_AMOUNT || "";
-  const envIntent = process.env.PAYPAL_INTENT || "";
-  const envMode = process.env.PAYPAL_MODE || "";
+  const paypal = resolvePaypalConfig(settings);
+  const isEnvOverride = paypal.source === "env";
   return {
     paypal: {
-      enabled: envClientId ? true : Boolean(paypal.enabled),
-      mode: (envMode || paypal.mode) === "live" ? "live" : "sandbox",
-      clientId: envClientId || paypal.clientId || "",
-      currency: (envCurrency || paypal.currency || "USD").toUpperCase(),
-      amount: String(envAmount || paypal.amount || "9.99"),
-      intent: String(envIntent || paypal.intent || "CAPTURE").toUpperCase(),
+      enabled: isEnvOverride ? true : Boolean(paypal.enabled),
+      mode: paypal.mode,
+      clientId: paypal.clientId,
+      configured: paypal.configured,
+      currency: paypal.currency,
+      amount: String(paypal.amount),
+      intent: String(paypal.intent),
+      configError: paypal.configError || "",
     },
   };
 }
