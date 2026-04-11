@@ -58,11 +58,7 @@ async function handleAuthRequest(method: 'GET' | 'POST', request: Request) {
       body,
     });
 
-    if (
-      response.status === 401 &&
-      method === 'POST' &&
-      url.pathname.endsWith('/api/auth/sign-up/email')
-    ) {
+    if (response.status === 401 && method === 'POST') {
       return NextResponse.json(
         {
           ok: false,
@@ -77,9 +73,15 @@ async function handleAuthRequest(method: 'GET' | 'POST', request: Request) {
             authUrl: process.env.AUTH_URL || '',
             appUrl: process.env.NEXT_PUBLIC_APP_URL || '',
             responseBody: body,
+            matchedPath: url.pathname.endsWith('/api/auth/sign-up/email'),
           },
         },
-        { status: 401 }
+        {
+          status: 401,
+          headers: {
+            'x-auth-debug': '1',
+          },
+        }
       );
     }
   }
