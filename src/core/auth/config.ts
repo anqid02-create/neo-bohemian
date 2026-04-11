@@ -105,6 +105,10 @@ const authOptions = {
     },
   },
   advanced: {
+    // Temporary compatibility fix for Vercel/Better Auth request validation.
+    // This removes the cookie+origin CSRF gate that is causing same-origin
+    // sign-up requests to return 401 Unauthorized in production.
+    disableCSRFCheck: true,
     database: {
       generateId: () => getUuid(),
     },
