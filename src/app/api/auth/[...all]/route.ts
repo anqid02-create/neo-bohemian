@@ -29,13 +29,36 @@ async function handleAuthRequest(method: 'GET' | 'POST', request: Request) {
     return limited;
   }
 
+  const url = new URL(request.url);
+
+  if (method === 'POST' && url.pathname.endsWith('/api/auth/sign-up/email')) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: 'probe-hit',
+        debug: {
+          marker: 'auth-probe-fc4593d',
+          pathname: url.pathname,
+          origin: request.headers.get('origin') || '',
+          referer: request.headers.get('referer') || '',
+          host: request.headers.get('host') || '',
+        },
+      },
+      {
+        status: 418,
+        headers: {
+          'x-auth-probe': '1',
+        },
+      }
+    );
+  }
+
   const auth = await getAuth();
   const handler = toNextJsHandler(auth.handler);
   const response =
     method === 'POST' ? await handler.POST(request) : await handler.GET(request);
 
   if (response.status >= 400) {
-    const url = new URL(request.url);
     let body = '';
 
     try {
