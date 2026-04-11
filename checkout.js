@@ -56,6 +56,7 @@ const translations = {
     loading: "Loading PayPal...",
     ready: "PayPal is ready. Complete payment to unlock.",
     blocked: "Please enter a valid email before continuing.",
+    emailOptional: "Email is optional. If you leave it blank, we will use your PayPal account email after payment.",
     processing: "Processing your payment...",
     success: "Success! Redirecting...",
     failed: "Payment failed. Please try again.",
@@ -101,6 +102,7 @@ const translations = {
     loading: "正在加载 PayPal...",
     ready: "PayPal 已就绪，完成支付即可解锁。",
     blocked: "请先填写有效邮箱再继续。",
+    emailOptional: "邮箱可选；如果留空，我们会在支付成功后优先使用你的 PayPal 账户邮箱。",
     processing: "正在处理支付...",
     success: "支付成功，正在跳转...",
     failed: "支付失败，请重试。",
@@ -215,11 +217,16 @@ function loadPayPalSdk(config) {
 }
 
 function unlockAndRedirect(email, captureDetails) {
+  const payerEmail =
+    email ||
+    captureDetails?.payer?.email_address ||
+    captureDetails?.payment_source?.paypal?.email_address ||
+    "";
   sessionStorage.setItem(
     "bazichart_demo_purchase",
     JSON.stringify({
       provider: "paypal",
-      email,
+      email: payerEmail,
       paidAt: new Date().toISOString(),
       reference: captureDetails.id || "",
       payerName: captureDetails.payer?.name?.given_name || "",
@@ -271,9 +278,12 @@ async function renderPayPal(lang) {
         style: { layout: "vertical", color: "gold", shape: "rect", label: "paypal", height: 48 },
         onClick(data, actions) {
           const email = emailInput?.value.trim() || "";
-          if (!isValidEmail(email)) {
+          if (email && !isValidEmail(email)) {
             setStatus(paymentStatus, t.blocked);
             return actions.reject();
+          }
+          if (!email) {
+            setStatus(paymentStatus, t.emailOptional);
           }
           return actions.resolve();
         },
