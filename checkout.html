@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
   <head>
+    <script 
+  src="https://www.paypal.com/sdk/js?client-id=BAAqREEwCtir2cICnQIfC1dunZOvcEyQjWJOSxgxHfsgzPmwMt8TvzDoxQYSdScLUKGcufnRCdqJVvdggg&components=hosted-buttons&disable-funding=venmo&currency=USD">
+</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Checkout | BaziChart</title>
@@ -40,7 +43,14 @@
       };
     </script>
     <style>
-      body {
+      body
+      <div id="paypal-container-KE5ALN7X8NAZA"></div>
+<script>
+  paypal.HostedButtons({
+    hostedButtonId: "KE5ALN7X8NAZA",
+  }).render("#paypal-container-KE5ALN7X8NAZA")
+</script>
+      {
         background:
           radial-gradient(circle at top, rgba(233, 195, 73, 0.08), transparent 22%),
           radial-gradient(circle at 85% 10%, rgba(218, 185, 255, 0.08), transparent 22%),
